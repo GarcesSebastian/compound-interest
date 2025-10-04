@@ -64,26 +64,26 @@ export function GrowthChart({ capital, rate, years, bankName }: GrowthChartProps
 
   return (
     <Card className="shadow-lg border-2 border-gray-200 overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-[#DC2626] to-[#EF4444] text-white p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-2xl flex items-center gap-2">
-              <TrendingUp className="w-6 h-6" />
-              Crecimiento del Capital en el Tiempo
+      <CardHeader className="bg-gradient-to-r from-[#DC2626] to-[#EF4444] text-white p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-lg sm:text-xl md:text-2xl flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+              <span className="truncate">Crecimiento del Capital en el Tiempo</span>
             </CardTitle>
-            <CardDescription className="text-red-100 mt-2">
+            <CardDescription className="text-red-100 mt-1 sm:mt-2 text-xs sm:text-sm">
               Visualización interactiva del crecimiento exponencial - {bankName}
             </CardDescription>
           </div>
-          <div className="text-right">
-            <div className="text-sm text-red-100">Crecimiento Total</div>
-            <div className="text-3xl font-bold">+{growthPercentage}%</div>
+          <div className="text-left sm:text-right flex-shrink-0">
+            <div className="text-xs sm:text-sm text-red-100">Crecimiento Total</div>
+            <div className="text-2xl sm:text-3xl font-bold">+{growthPercentage}%</div>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-6">
-        <ResponsiveContainer width="100%" height={450}>
-          <AreaChart data={dataPoints} margin={{ top: 10, right: 30, left: 20, bottom: 20 }}>
+      <CardContent className="pt-4 sm:pt-6 p-3 sm:p-6">
+        <ResponsiveContainer width="100%" height={300}>
+          <AreaChart data={dataPoints} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
             <defs>
               <linearGradient id="colorCapital" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#DC2626" stopOpacity={0.8} />
@@ -97,18 +97,18 @@ export function GrowthChart({ capital, rate, years, bankName }: GrowthChartProps
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis
               dataKey="year"
-              label={{ value: "Años", position: "insideBottom", offset: -10 }}
+              label={{ value: "Años", position: "insideBottom", offset: -10, fontSize: 11 }}
               stroke="#6b7280"
-              tick={{ fill: "#374151" }}
+              tick={{ fill: "#374151", fontSize: 11 }}
             />
             <YAxis
               tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
-              label={{ value: "Capital (COP)", angle: -90, position: "insideLeft" }}
+              label={{ value: "Capital (COP)", angle: -90, position: "insideLeft", fontSize: 11 }}
               stroke="#6b7280"
-              tick={{ fill: "#374151" }}
+              tick={{ fill: "#374151", fontSize: 10 }}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ paddingTop: "20px" }} iconType="circle" />
+            <Legend wrapperStyle={{ paddingTop: "20px", fontSize: 12 }} iconType="circle" />
             <Area
               type="monotone"
               dataKey="capital"
@@ -131,28 +131,28 @@ export function GrowthChart({ capital, rate, years, bankName }: GrowthChartProps
         </ResponsiveContainer>
 
         {/* Key Insights */}
-        <div className="grid md:grid-cols-3 gap-4 mt-6">
-          <div className="bg-gradient-to-br from-[#DC2626] to-[#EF4444] rounded-xl p-4 text-white">
-            <p className="text-sm text-red-100 mb-1">Capital Inicial</p>
-            <p className="text-2xl font-bold">{formatCurrency(capital)}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-4 sm:mt-6">
+          <div className="bg-gradient-to-br from-[#DC2626] to-[#EF4444] rounded-lg sm:rounded-xl p-3 sm:p-4 text-white">
+            <p className="text-xs sm:text-sm text-red-100 mb-1">Capital Inicial</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold break-words">{formatCurrency(capital)}</p>
           </div>
-          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-4 text-white">
-            <p className="text-sm text-orange-100 mb-1">Intereses Totales</p>
-            <p className="text-2xl font-bold">{formatCurrency(finalAmount - capital)}</p>
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg sm:rounded-xl p-3 sm:p-4 text-white">
+            <p className="text-xs sm:text-sm text-orange-100 mb-1">Intereses Totales</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold break-words">{formatCurrency(finalAmount - capital)}</p>
           </div>
-          <div className="bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl p-4 text-white">
-            <p className="text-sm text-gray-300 mb-1">Monto Final</p>
-            <p className="text-2xl font-bold">{formatCurrency(finalAmount)}</p>
+          <div className="bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 text-white">
+            <p className="text-xs sm:text-sm text-gray-300 mb-1">Monto Final</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold break-words">{formatCurrency(finalAmount)}</p>
           </div>
         </div>
 
         {/* Growth Explanation */}
-        <div className="mt-6 bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
-          <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
+        <div className="mt-4 sm:mt-6 bg-blue-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border-2 border-blue-200">
+          <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
             Análisis del Crecimiento Exponencial
           </h4>
-          <p className="text-sm text-gray-700 leading-relaxed">
+          <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
             El gráfico muestra cómo tu capital crece de forma{" "}
             <span className="font-bold text-blue-700">exponencial</span> debido al interés compuesto. Cada mes, los
             intereses se calculan sobre el capital acumulado (principal + intereses anteriores), lo que genera un efecto

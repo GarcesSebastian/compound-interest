@@ -82,10 +82,10 @@ export function BankComparison({ capital, years, refreshKey }: BankComparisonPro
   })
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Summary Cards */}
       {isLoading ? (
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {[1, 2, 3].map((i) => (
             <Card key={i} className="shadow-lg animate-pulse">
               <CardHeader>
@@ -101,39 +101,39 @@ export function BankComparison({ capital, years, refreshKey }: BankComparisonPro
           ))}
         </div>
       ) : (
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           <Card className="shadow-lg border-2 border-green-300 bg-green-50">
-            <CardHeader>
-              <CardTitle className="text-green-900">Mejor Opción</CardTitle>
-              <CardDescription>Menor costo total</CardDescription>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-green-900 text-base sm:text-lg">Mejor Opción</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Menor costo total</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-green-700 mb-2">{bestOption.name}</p>
-              <p className="text-sm text-gray-600">Tasa: {bestOption.rate}% E.A.</p>
-              <p className="text-lg font-semibold text-green-900 mt-3">{formatCurrency(bestOption.finalAmount)}</p>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700 mb-1 sm:mb-2 truncate">{bestOption.name}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Tasa: {bestOption.rate}% E.A.</p>
+              <p className="text-base sm:text-lg font-semibold text-green-900 mt-2 sm:mt-3 break-words">{formatCurrency(bestOption.finalAmount)}</p>
             </CardContent>
           </Card>
 
           <Card className="shadow-lg border-2 border-red-300 bg-red-50">
-            <CardHeader>
-              <CardTitle className="text-red-900">Opción Más Costosa</CardTitle>
-              <CardDescription>Mayor costo total</CardDescription>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-red-900 text-base sm:text-lg">Opción Más Costosa</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Mayor costo total</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-red-700 mb-2">{worstOption.name}</p>
-              <p className="text-sm text-gray-600">Tasa: {worstOption.rate}% E.A.</p>
-              <p className="text-lg font-semibold text-red-900 mt-3">{formatCurrency(worstOption.finalAmount)}</p>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-red-700 mb-1 sm:mb-2 truncate">{worstOption.name}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Tasa: {worstOption.rate}% E.A.</p>
+              <p className="text-base sm:text-lg font-semibold text-red-900 mt-2 sm:mt-3 break-words">{formatCurrency(worstOption.finalAmount)}</p>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-2 border-[#DC2626] bg-gradient-to-br from-[#DC2626] to-[#EF4444] text-white">
-            <CardHeader>
-              <CardTitle>Ahorro Potencial</CardTitle>
-              <CardDescription className="text-red-100">Eligiendo la mejor opción</CardDescription>
+          <Card className="shadow-lg border-2 border-[#DC2626] bg-gradient-to-br from-[#DC2626] to-[#EF4444] text-white sm:col-span-2 md:col-span-1">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg">Ahorro Potencial</CardTitle>
+              <CardDescription className="text-red-100 text-xs sm:text-sm">Eligiendo la mejor opción</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold mb-2">{formatCurrency(savings)}</p>
-              <p className="text-sm opacity-90">Diferencia entre mejor y peor opción</p>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <p className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">{formatCurrency(savings)}</p>
+              <p className="text-xs sm:text-sm opacity-90">Diferencia entre mejor y peor opción</p>
             </CardContent>
           </Card>
         </div>
@@ -141,11 +141,11 @@ export function BankComparison({ capital, years, refreshKey }: BankComparisonPro
 
       {/* Detailed Comparison Table */}
       <Card className="shadow-lg">
-        <CardHeader className="bg-gray-50">
-          <CardTitle>Comparación Detallada</CardTitle>
-          <CardDescription>Análisis completo de todas las entidades bancarias</CardDescription>
+        <CardHeader className="bg-gray-50 p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg md:text-xl">Comparación Detallada</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Análisis completo de todas las entidades bancarias</CardDescription>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-4 sm:pt-6 p-3 sm:p-6">
           {isLoading ? (
             <div className="space-y-3 animate-pulse">
               {[1, 2, 3, 4].map((i) => (
@@ -159,15 +159,15 @@ export function BankComparison({ capital, years, refreshKey }: BankComparisonPro
               ))}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <table className="w-full min-w-[500px]">
                 <thead>
                   <tr className="border-b-2 border-gray-300">
-                    <th className="text-left py-3 px-4 font-semibold">Banco</th>
-                    <th className="text-right py-3 px-4 font-semibold">Tasa E.A.</th>
-                    <th className="text-right py-3 px-4 font-semibold">Monto Final</th>
-                    <th className="text-right py-3 px-4 font-semibold">Intereses</th>
-                    <th className="text-center py-3 px-4 font-semibold">Ranking</th>
+                    <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">Banco</th>
+                    <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">Tasa E.A.</th>
+                    <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">Monto Final</th>
+                    <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">Intereses</th>
+                    <th className="text-center py-2 sm:py-3 px-2 sm:px-4 font-semibold text-xs sm:text-sm">Ranking</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -182,15 +182,15 @@ export function BankComparison({ capital, years, refreshKey }: BankComparisonPro
                             : "hover:bg-gray-50"
                       }`}
                     >
-                      <td className="py-4 px-4 font-semibold">{result.name}</td>
-                      <td className="py-4 px-4 text-right">{result.rate}%</td>
-                      <td className="py-4 px-4 text-right font-semibold">{formatCurrency(result.finalAmount)}</td>
-                      <td className="py-4 px-4 text-right text-[#DC2626] font-semibold">
+                      <td className="py-3 sm:py-4 px-2 sm:px-4 font-semibold text-xs sm:text-sm">{result.name}</td>
+                      <td className="py-3 sm:py-4 px-2 sm:px-4 text-right text-xs sm:text-sm">{result.rate}%</td>
+                      <td className="py-3 sm:py-4 px-2 sm:px-4 text-right font-semibold text-xs sm:text-sm">{formatCurrency(result.finalAmount)}</td>
+                      <td className="py-3 sm:py-4 px-2 sm:px-4 text-right text-[#DC2626] font-semibold text-xs sm:text-sm">
                         {formatCurrency(result.totalInterest)}
                       </td>
-                      <td className="py-4 px-4 text-center">
+                      <td className="py-3 sm:py-4 px-2 sm:px-4 text-center">
                         <span
-                          className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-bold ${
+                          className={`inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full font-bold text-xs sm:text-sm ${
                             index === 0
                               ? "bg-green-500 text-white"
                               : index === sortedResults.length - 1
@@ -212,26 +212,26 @@ export function BankComparison({ capital, years, refreshKey }: BankComparisonPro
 
       {/* Bar Chart Comparison */}
       <Card className="shadow-lg">
-        <CardHeader className="bg-gray-50">
-          <CardTitle>Comparación Visual: Montos Finales</CardTitle>
-          <CardDescription>Monto total a pagar por cada banco</CardDescription>
+        <CardHeader className="bg-gray-50 p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg md:text-xl">Comparación Visual: Montos Finales</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Monto total a pagar por cada banco</CardDescription>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-4 sm:pt-6 p-3 sm:p-6">
           {isLoading ? (
-            <div className="h-[400px] w-full bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
-              <div className="text-gray-400 text-lg font-semibold">Cargando gráfica...</div>
+            <div className="h-[300px] sm:h-[400px] w-full bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
+              <div className="text-gray-400 text-sm sm:text-base md:text-lg font-semibold">Cargando gráfica...</div>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={300}>
               <BarChart data={comparisonData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
+                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} />
                 <Tooltip
                   formatter={(value: number) => formatCurrency(value)}
                   contentStyle={{ backgroundColor: "white", border: "2px solid #DC2626" }}
                 />
-                <Legend />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Bar dataKey="Monto Final" fill="#DC2626" />
               </BarChart>
             </ResponsiveContainer>
@@ -241,26 +241,26 @@ export function BankComparison({ capital, years, refreshKey }: BankComparisonPro
 
       {/* Interest Comparison */}
       <Card className="shadow-lg">
-        <CardHeader className="bg-gray-50">
-          <CardTitle>Comparación de Intereses Totales</CardTitle>
-          <CardDescription>Cuánto pagas solo en intereses</CardDescription>
+        <CardHeader className="bg-gray-50 p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg md:text-xl">Comparación de Intereses Totales</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Cuánto pagas solo en intereses</CardDescription>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-4 sm:pt-6 p-3 sm:p-6">
           {isLoading ? (
-            <div className="h-[400px] w-full bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
-              <div className="text-gray-400 text-lg font-semibold">Cargando gráfica...</div>
+            <div className="h-[300px] sm:h-[400px] w-full bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
+              <div className="text-gray-400 text-sm sm:text-base md:text-lg font-semibold">Cargando gráfica...</div>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={300}>
               <BarChart data={comparisonData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} />
+                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                <YAxis tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} />
                 <Tooltip
                   formatter={(value: number) => formatCurrency(value)}
                   contentStyle={{ backgroundColor: "white", border: "2px solid #EF4444" }}
                 />
-                <Legend />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Bar dataKey="Intereses" fill="#EF4444" />
               </BarChart>
             </ResponsiveContainer>
@@ -270,37 +270,38 @@ export function BankComparison({ capital, years, refreshKey }: BankComparisonPro
 
       {/* Evolution Over Time */}
       <Card className="shadow-lg">
-        <CardHeader className="bg-gray-50">
-          <CardTitle>Evolución del Capital en el Tiempo</CardTitle>
-          <CardDescription>Crecimiento exponencial del préstamo</CardDescription>
+        <CardHeader className="bg-gray-50 p-4 sm:p-6">
+          <CardTitle className="text-base sm:text-lg md:text-xl">Evolución del Capital en el Tiempo</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Crecimiento exponencial del préstamo</CardDescription>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-4 sm:pt-6 p-3 sm:p-6">
           {isLoading ? (
-            <div className="h-[500px] w-full bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
-              <div className="text-gray-400 text-lg font-semibold">Cargando gráfica...</div>
+            <div className="h-[300px] sm:h-[400px] md:h-[500px] w-full bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
+              <div className="text-gray-400 text-sm sm:text-base md:text-lg font-semibold">Cargando gráfica...</div>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={500}>
+            <ResponsiveContainer width="100%" height={350}>
               <LineChart data={evolutionData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="year" label={{ value: "Años", position: "insideBottom", offset: -5 }} />
+                <XAxis dataKey="year" label={{ value: "Años", position: "insideBottom", offset: -5, fontSize: 12 }} tick={{ fontSize: 11 }} />
                 <YAxis
                   tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
-                  label={{ value: "Capital (COP)", angle: -90, position: "insideLeft" }}
+                  label={{ value: "Capital (COP)", angle: -90, position: "insideLeft", fontSize: 12 }}
+                  tick={{ fontSize: 11 }}
                 />
                 <Tooltip
                   formatter={(value: number) => formatCurrency(value)}
-                  contentStyle={{ backgroundColor: "white", border: "2px solid #DC2626" }}
+                  contentStyle={{ backgroundColor: "white", border: "2px solid #DC2626", fontSize: 12 }}
                 />
-                <Legend />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
                 {results.map((bank, index) => (
                   <Line
                     key={bank.id}
                     type="monotone"
                     dataKey={bank.name}
                     stroke={["#DC2626", "#3B82F6", "#10B981", "#F59E0B"][index]}
-                    strokeWidth={3}
-                    dot={{ r: 4 }}
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
                   />
                 ))}
               </LineChart>

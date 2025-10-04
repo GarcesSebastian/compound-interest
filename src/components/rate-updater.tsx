@@ -59,21 +59,21 @@ export function RateUpdater({ onClose, onUpdate }: RateUpdaterProps) {
     <>
       <div className="fixed inset-0 bg-black/20 z-50" onClick={onClose} />
 
-      <div className="fixed bottom-24 right-6 bg-white rounded-xl shadow-2xl z-50 w-[380px] max-h-[600px] overflow-y-auto">
-        <div className="sticky top-0 bg-gradient-to-r from-[#DC2626] to-[#EF4444] text-white p-3 rounded-t-xl flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-bold">Actualizar Tasas</h3>
+      <div className="fixed bottom-16 sm:bottom-24 left-4 right-4 sm:left-auto sm:right-6 bg-white rounded-xl shadow-2xl z-50 sm:w-[380px] max-h-[70vh] sm:max-h-[600px] overflow-y-auto">
+        <div className="sticky top-0 bg-gradient-to-r from-[#DC2626] to-[#EF4444] text-white p-3 sm:p-4 rounded-t-xl flex items-center justify-between">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm sm:text-base font-bold truncate">Actualizar Tasas</h3>
             <p className="text-red-100 text-xs">Modifica en tiempo real</p>
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors flex-shrink-0 ml-2"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
-        <div className="p-3 space-y-3">
+        <div className="p-3 sm:p-4 space-y-3">
           {isLoading ? (
             <>
               {[1, 2, 3, 4].map((i) => (
@@ -90,24 +90,24 @@ export function RateUpdater({ onClose, onUpdate }: RateUpdaterProps) {
             <>
               {rates.map((bank) => (
                 <div key={bank.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                  <Label className="text-sm font-bold text-gray-900 mb-2 block">{bank.name}</Label>
+                  <Label className="text-xs sm:text-sm font-bold text-gray-900 mb-2 block truncate">{bank.name}</Label>
                   <div className="flex items-center gap-2">
                     <Input
                       type="text"
                       value={bank.rate}
                       onChange={(e) => handleRateChange(bank.id, e.target.value)}
                       placeholder="0"
-                      className="text-lg font-bold h-9 text-[#DC2626]"
+                      className="text-base sm:text-lg font-bold h-9 sm:h-10 text-[#DC2626]"
                     />
-                    <span className="text-sm font-bold text-gray-600 whitespace-nowrap">% E.A.</span>
+                    <span className="text-xs sm:text-sm font-bold text-gray-600 whitespace-nowrap">% E.A.</span>
                   </div>
                 </div>
               ))}
             </>
           )}
 
-          <div className="bg-blue-50 rounded-lg p-2 border border-blue-200">
-            <p className="text-xs text-blue-900">
+          <div className="bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-200">
+            <p className="text-xs text-blue-900 leading-relaxed">
               • Usa coma (,) como separador decimal, no punto (.)
               <br />• Solo se permiten números y comas
               <br />• Los cambios se guardan en tu navegador
@@ -115,11 +115,11 @@ export function RateUpdater({ onClose, onUpdate }: RateUpdaterProps) {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={handleSave} className="flex-1 h-9 text-sm bg-[#DC2626] hover:bg-[#B91C1C]">
-              <Save className="w-4 h-4 mr-1" />
+            <Button onClick={handleSave} className="flex-1 h-9 sm:h-10 text-xs sm:text-sm bg-[#DC2626] hover:bg-[#B91C1C]">
+              <Save className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
               Guardar
             </Button>
-            <Button onClick={onClose} variant="outline" className="h-9 px-4 text-sm bg-transparent">
+            <Button onClick={onClose} variant="outline" className="h-9 sm:h-10 px-3 sm:px-4 text-xs sm:text-sm bg-transparent">
               Cancelar
             </Button>
           </div>
