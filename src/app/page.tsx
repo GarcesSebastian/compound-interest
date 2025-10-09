@@ -2,17 +2,20 @@
 
 import { useState } from "react"
 import { Calculator } from "@/components/calculator"
+import { AdvancedCalculator } from "@/components/advanced-calculator"
 import { MathExplanation } from "@/components/math-explanation"
 import { BankComparison } from "@/components/bank-comparison"
 import { RateUpdater } from "@/components/rate-updater"
 import { Button } from "@/components/ui/button"
 import { RefreshCw } from "lucide-react"
 
+type Section = "calculator" | "advanced" | "math" | "comparison"
+
 export default function Home() {
   const [capital, setCapital] = useState(15000000)
   const [years, setYears] = useState(4)
   const [selectedBank, setSelectedBank] = useState<string | null>(null)
-  const [activeSection, setActiveSection] = useState<"calculator" | "math" | "comparison">("calculator")
+  const [activeSection, setActiveSection] = useState<Section>("calculator")
   const [showRateUpdater, setShowRateUpdater] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -43,16 +46,25 @@ export default function Home() {
           <div className="flex gap-0.5 sm:gap-1 overflow-x-auto scrollbar-hide">
             <button
               onClick={() => setActiveSection("calculator")}
-              className={`px-3 sm:px-6 md:px-8 py-3 sm:py-4 font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-all relative whitespace-nowrap ${
+              className={`px-3 sm:px-6 md:px-8 py-3 sm:py-4 font-semibold text-xs sm:text-sm md:text-base transition-all relative whitespace-nowrap ${
                 activeSection === "calculator" ? "text-[#DC2626]" : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Calculadora Interactiva
+              Calculadora Básica
               {activeSection === "calculator" && <div className="absolute bottom-0 left-0 right-0 h-0.5 sm:h-1 bg-[#DC2626]" />}
             </button>
             <button
+              onClick={() => setActiveSection("advanced")}
+              className={`px-3 sm:px-6 md:px-8 py-3 sm:py-4 font-semibold text-xs sm:text-sm md:text-base transition-all relative whitespace-nowrap ${
+                activeSection === "advanced" ? "text-[#DC2626]" : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Calculadora Avanzada
+              {activeSection === "advanced" && <div className="absolute bottom-0 left-0 right-0 h-0.5 sm:h-1 bg-[#DC2626]" />}
+            </button>
+            <button
               onClick={() => setActiveSection("math")}
-              className={`px-3 sm:px-6 md:px-8 py-3 sm:py-4 font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-all relative whitespace-nowrap ${
+              className={`px-3 sm:px-6 md:px-8 py-3 sm:py-4 font-semibold text-xs sm:text-sm md:text-base transition-all relative whitespace-nowrap ${
                 activeSection === "math" ? "text-[#DC2626]" : "text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -61,7 +73,7 @@ export default function Home() {
             </button>
             <button
               onClick={() => setActiveSection("comparison")}
-              className={`px-3 sm:px-6 md:px-8 py-3 sm:py-4 font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-all relative whitespace-nowrap ${
+              className={`px-3 sm:px-6 md:px-8 py-3 sm:py-4 font-semibold text-xs sm:text-sm md:text-base transition-all relative whitespace-nowrap ${
                 activeSection === "comparison" ? "text-[#DC2626]" : "text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -84,6 +96,8 @@ export default function Home() {
             refreshKey={refreshKey}
           />
         )}
+
+        {activeSection === "advanced" && <AdvancedCalculator />}
 
         {activeSection === "math" && <MathExplanation />}
 
