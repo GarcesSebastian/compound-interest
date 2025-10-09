@@ -433,7 +433,7 @@ export function MathExplanation() {
           <div className="bg-rose-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border-2 border-rose-300">
             <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-rose-900 mb-4 sm:mb-6">Modelo Completo: Tasas Variables + Aportes Periódicos</h3>
             <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 border-2 border-rose-200 mb-4">
-              <BlockMath>{"P(t) = P_0 \\prod \\left(1 + \\frac{r_i}{n}\\right)^{nt_i} + \\sum A_j \\prod \\left(1 + \\frac{r_i}{n}\\right)^{n \\cdot \\tau_{i,j}}"}</BlockMath>
+              <BlockMath>{"P(t) = P_0 \\prod_{i=1}^{m} \\left(1 + \\frac{r_i}{n}\\right)^{nt_i} + \\sum_{j=1}^{k} A_j \\prod_{i=1}^{m} \\left(1 + \\frac{r_i}{n}\\right)^{n \\cdot \\tau_{i,j}}"}</BlockMath>
             </div>
             
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-4 border-l-4 border-rose-500">
@@ -441,6 +441,10 @@ export function MathExplanation() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
                 <div><InlineMath>{"\\prod"}</InlineMath> = Símbolo de <strong>producto</strong> (multiplicación)</div>
                 <div><InlineMath>{"\\sum"}</InlineMath> = Símbolo de <strong>sumatoria</strong> (suma de todos los términos)</div>
+                <div><InlineMath>{"m"}</InlineMath> = Número total de períodos con diferentes tasas</div>
+                <div><InlineMath>{"k"}</InlineMath> = Número total de aportes realizados</div>
+                <div><InlineMath>{"i"}</InlineMath> = Índice del período de tasas (1, 2, ..., m)</div>
+                <div><InlineMath>{"j"}</InlineMath> = Índice del aporte (1, 2, ..., k)</div>
                 <div><InlineMath>{"r_i"}</InlineMath> = Tasa de interés en el período <InlineMath>{"i"}</InlineMath></div>
                 <div><InlineMath>{"t_i"}</InlineMath> = Duración del período <InlineMath>{"i"}</InlineMath></div>
                 <div><InlineMath>{"A_j"}</InlineMath> = Aporte realizado en el momento <InlineMath>{"j"}</InlineMath></div>
