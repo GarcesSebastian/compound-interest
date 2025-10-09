@@ -424,42 +424,6 @@ export function MathExplanation() {
               </div>
             </div>
           </div>
-
-          <div className="bg-indigo-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border-2 border-indigo-300">
-            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-indigo-900 mb-4 sm:mb-6">Modelo Continuo con Tasas Variables</h3>
-            <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 border-2 border-indigo-200 mb-4">
-              <BlockMath>{"P(t) = P_0 \\times e^{r_1 t_1} \\times e^{r_2 t_2} \\times e^{r_3 t_3} \\times \\cdots"}</BlockMath>
-              <div className="mt-4">
-                <BlockMath>{"= P_0 \\exp\\left(\\int_0^t r(\\tau) \\, d\\tau\\right)"}</BlockMath>
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-4 border-l-4 border-indigo-500">
-              <h4 className="font-bold text-indigo-900 mb-3 text-sm sm:text-base">📖 Diccionario de Variables y Símbolos:</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
-                <div><InlineMath>{"\\int"}</InlineMath> = Símbolo de <strong>integral</strong> (suma continua)</div>
-                <div><InlineMath>{"r(\\tau)"}</InlineMath> = Función de tasa variable en el tiempo</div>
-                <div><InlineMath>{"\\tau"}</InlineMath> = Variable de integración (tiempo)</div>
-                <div><InlineMath>{"\\exp(x)"}</InlineMath> = Función exponencial = <InlineMath>{"e^x"}</InlineMath></div>
-                <div><InlineMath>{"r_i"}</InlineMath> = Tasa constante en el período <InlineMath>{"i"}</InlineMath></div>
-                <div><InlineMath>{"t_i"}</InlineMath> = Duración del período <InlineMath>{"i"}</InlineMath></div>
-              </div>
-              <div className="mt-3 p-2 bg-indigo-100 rounded border border-indigo-300">
-                <p className="text-xs font-semibold text-indigo-900">Interpretación:</p>
-                <p className="text-xs text-gray-700">La integral suma el efecto acumulado de todas las tasas a lo largo del tiempo</p>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg p-3 sm:p-4 border border-indigo-200">
-              <p className="text-xs sm:text-sm text-gray-600 mb-2">Aplicaciones en la práctica bancaria:</p>
-              <ul className="text-xs sm:text-sm text-gray-700 space-y-1 list-disc list-inside">
-                <li>Cambios en política monetaria del Banco de la República</li>
-                <li>Variaciones en indicadores DTF o IBR</li>
-                <li>Promociones especiales por períodos limitados</li>
-                <li>Ajustes por inflación o condiciones macroeconómicas</li>
-              </ul>
-            </div>
-          </div>
         </div>
       )}
 
@@ -547,24 +511,6 @@ export function MathExplanation() {
                     Total invertido: $9,800,000 | Rendimiento: $1,444,400 (14.7%)
                   </p>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border-2 border-purple-300">
-            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-purple-900 mb-3">💡 Consideraciones Prácticas</h3>
-            <div className="space-y-2 text-sm sm:text-base text-gray-700">
-              <div className="bg-white rounded-lg p-3 border border-purple-200">
-                <p className="font-semibold text-purple-900">Documentación:</p>
-                <p className="text-xs sm:text-sm">Mantener registro detallado de cada cambio de tasa y su fecha efectiva</p>
-              </div>
-              <div className="bg-white rounded-lg p-3 border border-purple-200">
-                <p className="font-semibold text-purple-900">Verificación:</p>
-                <p className="text-xs sm:text-sm">Calcular el saldo después de cada período para detectar errores</p>
-              </div>
-              <div className="bg-white rounded-lg p-3 border border-purple-200">
-                <p className="font-semibold text-purple-900">Proyección:</p>
-                <p className="text-xs sm:text-sm">Considerar escenarios pesimista, base y optimista para tasas futuras</p>
               </div>
             </div>
           </div>
