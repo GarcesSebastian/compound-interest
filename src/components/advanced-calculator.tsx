@@ -13,30 +13,32 @@ import {
   type RatePeriod,
 } from "@/lib/calculations"
 import { formatCurrency } from "@/lib/utils"
-import { PlusCircle, MinusCircle, Calculator as CalcIcon } from "lucide-react"
+import { PlusCircle, Calculator as CalcIcon } from "lucide-react"
+import { useNumericInput } from "@/hooks/use-numeric-input"
+import { RatePeriodInput } from "@/components/rate-period-input"
 
 type CalculatorMode = "contributions" | "variableRates" | "complete"
 
 export function AdvancedCalculator() {
   const [mode, setMode] = useState<CalculatorMode>("contributions")
 
-  // Contributions state
-  const [principal, setPrincipal] = useState(5000000)
-  const [annualRate, setAnnualRate] = useState(8)
-  const [years, setYears] = useState(2)
-  const [monthlyContribution, setMonthlyContribution] = useState(200000)
+  // Contributions state with flexible inputs
+  const principal = useNumericInput(5000000, 0)
+  const annualRate = useNumericInput(8, 0, 100)
+  const years = useNumericInput(2, 0, 100)
+  const monthlyContribution = useNumericInput(200000, 0)
 
-  // Variable rates state
-  const [varPrincipal, setVarPrincipal] = useState(20000000)
+  // Variable rates state with flexible inputs
+  const varPrincipal = useNumericInput(20000000, 0)
   const [ratePeriods, setRatePeriods] = useState<RatePeriod[]>([
     { rate: 14, years: 1 },
     { rate: 17, years: 1 },
     { rate: 18.5, years: 3 },
   ])
 
-  // Complete model state
-  const [completePrincipal, setCompletePrincipal] = useState(5000000)
-  const [completeContribution, setCompleteContribution] = useState(200000)
+  // Complete model state with flexible inputs
+  const completePrincipal = useNumericInput(5000000, 0)
+  const completeContribution = useNumericInput(200000, 0)
   const [completeRatePeriods, setCompleteRatePeriods] = useState<RatePeriod[]>([
     { rate: 8, years: 1 },
     { rate: 10, years: 1 },
@@ -48,27 +50,27 @@ export function AdvancedCalculator() {
   const [completeResult, setCompleteResult] = useState<any>(null)
 
   const calculateContributions = () => {
-    const discrete = calculateWithContributions(principal, annualRate, years, 12, monthlyContribution)
+    const discrete = calculateWithContributions(principal.numericValue, annualRate.numericValue, years.numericValue, 12, monthlyContribution.numericValue)
     const continuous = calculateContinuousWithContributions(
-      principal,
-      annualRate,
-      years,
-      monthlyContribution * 12,
+      principal.numericValue,
+      annualRate.numericValue,
+      years.numericValue,
+      monthlyContribution.numericValue * 12,
     )
     setContribResult({ discrete, continuous })
   }
 
   const calculateVariableRates = () => {
-    const result = calculateWithVariableRates(varPrincipal, ratePeriods, 12)
+    const result = calculateWithVariableRates(varPrincipal.numericValue, ratePeriods, 12)
     setVarRatesResult(result)
   }
 
   const calculateComplete = () => {
     const result = calculateVariableRatesWithContributions(
-      completePrincipal,
+      completePrincipal.numericValue,
       completeRatePeriods,
       12,
-      completeContribution,
+      completeContribution.numericValue,
     )
     setCompleteResult(result)
   }
@@ -81,9 +83,15 @@ export function AdvancedCalculator() {
     setRatePeriods(ratePeriods.filter((_, i) => i !== index))
   }
 
-  const updateRatePeriod = (index: number, field: keyof RatePeriod, value: number) => {
+  const updateRatePeriodRate = (index: number, value: number) => {
     const updated = [...ratePeriods]
-    updated[index] = { ...updated[index], [field]: value }
+    updated[index] = { ...updated[index], rate: value }
+    setRatePeriods(updated)
+  }
+
+  const updateRatePeriodYears = (index: number, value: number) => {
+    const updated = [...ratePeriods]
+    updated[index] = { ...updated[index], years: value }
     setRatePeriods(updated)
   }
 
@@ -95,9 +103,15 @@ export function AdvancedCalculator() {
     setCompleteRatePeriods(completeRatePeriods.filter((_, i) => i !== index))
   }
 
-  const updateCompleteRatePeriod = (index: number, field: keyof RatePeriod, value: number) => {
+  const updateCompleteRatePeriodRate = (index: number, value: number) => {
     const updated = [...completeRatePeriods]
-    updated[index] = { ...updated[index], [field]: value }
+    updated[index] = { ...updated[index], rate: value }
+    setCompleteRatePeriods(updated)
+  }
+
+  const updateCompleteRatePeriodYears = (index: number, value: number) => {
+    const updated = [...completeRatePeriods]
+    updated[index] = { ...updated[index], years: value }
     setCompleteRatePeriods(updated)
   }
 
@@ -148,9 +162,11 @@ export function AdvancedCalculator() {
                 </Label>
                 <Input
                   id="contrib-principal"
-                  type="number"
-                  value={principal}
-                  onChange={(e) => setPrincipal(Number(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  value={principal.displayValue}
+                  onChange={(e) => principal.handleChange(e.target.value)}
+                  onBlur={principal.handleBlur}
                   className="text-base"
                 />
               </div>
@@ -161,11 +177,13 @@ export function AdvancedCalculator() {
                 </Label>
                 <Input
                   id="contrib-rate"
-                  type="number"
-                  step="0.1"
-                  value={annualRate}
-                  onChange={(e) => setAnnualRate(Number(e.target.value))}
+                  type="text"
+                  inputMode="decimal"
+                  value={annualRate.displayValue}
+                  onChange={(e) => annualRate.handleChange(e.target.value)}
+                  onBlur={annualRate.handleBlur}
                   className="text-base"
+                  placeholder="Ej: 18.5"
                 />
               </div>
 
@@ -175,9 +193,11 @@ export function AdvancedCalculator() {
                 </Label>
                 <Input
                   id="contrib-years"
-                  type="number"
-                  value={years}
-                  onChange={(e) => setYears(Number(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  value={years.displayValue}
+                  onChange={(e) => years.handleChange(e.target.value)}
+                  onBlur={years.handleBlur}
                   className="text-base"
                 />
               </div>
@@ -188,9 +208,11 @@ export function AdvancedCalculator() {
                 </Label>
                 <Input
                   id="monthly-contrib"
-                  type="number"
-                  value={monthlyContribution}
-                  onChange={(e) => setMonthlyContribution(Number(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  value={monthlyContribution.displayValue}
+                  onChange={(e) => monthlyContribution.handleChange(e.target.value)}
+                  onBlur={monthlyContribution.handleBlur}
                   className="text-base"
                 />
               </div>
@@ -218,7 +240,7 @@ export function AdvancedCalculator() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Total Aportado:</span>
-                      <span className="font-semibold">{formatCurrency(contribResult.discrete.totalContributions)}</span>
+                      <span className="font-semibold">{formatCurrency(principal.numericValue + contribResult.discrete.totalContributions)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Intereses Ganados:</span>
@@ -238,7 +260,7 @@ export function AdvancedCalculator() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Total Aportado:</span>
-                      <span className="font-semibold">{formatCurrency(contribResult.continuous.totalContributions)}</span>
+                      <span className="font-semibold">{formatCurrency(principal.numericValue + contribResult.continuous.totalContributions)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Intereses Ganados:</span>
@@ -253,19 +275,19 @@ export function AdvancedCalculator() {
                   <h4 className="font-bold text-green-900 mb-2">Resumen</h4>
                   <div className="space-y-1 text-sm">
                     <p className="text-gray-700">
-                      Capital inicial: <span className="font-semibold">{formatCurrency(principal)}</span>
+                      Capital inicial: <span className="font-semibold">{formatCurrency(principal.numericValue)}</span>
                     </p>
                     <p className="text-gray-700">
                       Total invertido:{" "}
                       <span className="font-semibold">
-                        {formatCurrency(principal + contribResult.discrete.totalContributions)}
+                        {formatCurrency(principal.numericValue + contribResult.discrete.totalContributions)}
                       </span>
                     </p>
                     <p className="text-green-900 font-bold text-base mt-2">
                       Rendimiento:{" "}
                       {(
                         (contribResult.discrete.totalInterest /
-                          (principal + contribResult.discrete.totalContributions)) *
+                          (principal.numericValue + contribResult.discrete.totalContributions)) *
                         100
                       ).toFixed(2)}
                       %
@@ -293,9 +315,11 @@ export function AdvancedCalculator() {
                 </Label>
                 <Input
                   id="var-principal"
-                  type="number"
-                  value={varPrincipal}
-                  onChange={(e) => setVarPrincipal(Number(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  value={varPrincipal.displayValue}
+                  onChange={(e) => varPrincipal.handleChange(e.target.value)}
+                  onBlur={varPrincipal.handleBlur}
                   className="text-base"
                 />
               </div>
@@ -315,43 +339,16 @@ export function AdvancedCalculator() {
                 </div>
 
                 {ratePeriods.map((period, index) => (
-                  <div key={index} className="bg-gray-50 rounded-lg p-3 space-y-2 border border-gray-200">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Período {index + 1}</span>
-                      {ratePeriods.length > 1 && (
-                        <Button
-                          onClick={() => removeRatePeriod(index)}
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 h-7 px-2"
-                        >
-                          <MinusCircle className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label className="text-xs text-gray-600">Tasa (%)</Label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          value={period.rate}
-                          onChange={(e) => updateRatePeriod(index, "rate", Number(e.target.value))}
-                          className="text-sm h-9"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-gray-600">Años</Label>
-                        <Input
-                          type="number"
-                          step="0.5"
-                          value={period.years}
-                          onChange={(e) => updateRatePeriod(index, "years", Number(e.target.value))}
-                          className="text-sm h-9"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <RatePeriodInput
+                    key={index}
+                    rate={period.rate}
+                    years={period.years}
+                    index={index}
+                    canRemove={ratePeriods.length > 1}
+                    onRateChange={updateRatePeriodRate}
+                    onYearsChange={updateRatePeriodYears}
+                    onRemove={removeRatePeriod}
+                  />
                 ))}
               </div>
 
@@ -375,7 +372,7 @@ export function AdvancedCalculator() {
                   <div className="space-y-2 text-sm border-t-2 border-orange-200 pt-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Capital Inicial:</span>
-                      <span className="font-semibold">{formatCurrency(varPrincipal)}</span>
+                      <span className="font-semibold">{formatCurrency(varPrincipal.numericValue)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Intereses Totales:</span>
@@ -426,9 +423,11 @@ export function AdvancedCalculator() {
                 </Label>
                 <Input
                   id="complete-principal"
-                  type="number"
-                  value={completePrincipal}
-                  onChange={(e) => setCompletePrincipal(Number(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  value={completePrincipal.displayValue}
+                  onChange={(e) => completePrincipal.handleChange(e.target.value)}
+                  onBlur={completePrincipal.handleBlur}
                   className="text-base"
                 />
               </div>
@@ -439,9 +438,11 @@ export function AdvancedCalculator() {
                 </Label>
                 <Input
                   id="complete-contribution"
-                  type="number"
-                  value={completeContribution}
-                  onChange={(e) => setCompleteContribution(Number(e.target.value))}
+                  type="text"
+                  inputMode="numeric"
+                  value={completeContribution.displayValue}
+                  onChange={(e) => completeContribution.handleChange(e.target.value)}
+                  onBlur={completeContribution.handleBlur}
                   className="text-base"
                 />
               </div>
@@ -461,43 +462,16 @@ export function AdvancedCalculator() {
                 </div>
 
                 {completeRatePeriods.map((period, index) => (
-                  <div key={index} className="bg-gray-50 rounded-lg p-3 space-y-2 border border-gray-200">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Período {index + 1}</span>
-                      {completeRatePeriods.length > 1 && (
-                        <Button
-                          onClick={() => removeCompleteRatePeriod(index)}
-                          variant="ghost"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 h-7 px-2"
-                        >
-                          <MinusCircle className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label className="text-xs text-gray-600">Tasa (%)</Label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          value={period.rate}
-                          onChange={(e) => updateCompleteRatePeriod(index, "rate", Number(e.target.value))}
-                          className="text-sm h-9"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-gray-600">Años</Label>
-                        <Input
-                          type="number"
-                          step="0.5"
-                          value={period.years}
-                          onChange={(e) => updateCompleteRatePeriod(index, "years", Number(e.target.value))}
-                          className="text-sm h-9"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <RatePeriodInput
+                    key={index}
+                    rate={period.rate}
+                    years={period.years}
+                    index={index}
+                    canRemove={completeRatePeriods.length > 1}
+                    onRateChange={updateCompleteRatePeriodRate}
+                    onYearsChange={updateCompleteRatePeriodYears}
+                    onRemove={removeCompleteRatePeriod}
+                  />
                 ))}
               </div>
 
@@ -522,15 +496,11 @@ export function AdvancedCalculator() {
                   <div className="space-y-2 text-sm border-t-2 border-purple-200 pt-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Capital Inicial:</span>
-                      <span className="font-semibold">{formatCurrency(completePrincipal)}</span>
+                      <span className="font-semibold">{formatCurrency(completePrincipal.numericValue)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Total Aportado:</span>
-                      <span className="font-semibold">{formatCurrency(completeResult.totalContributions)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Total Invertido:</span>
-                      <span className="font-bold">{formatCurrency(completePrincipal + completeResult.totalContributions)}</span>
+                      <span className="font-semibold">{formatCurrency(completePrincipal.numericValue + completeResult.totalContributions)}</span>
                     </div>
                     <div className="flex justify-between pt-2 border-t border-purple-200">
                       <span className="text-gray-700 font-semibold">Intereses Ganados:</span>
@@ -543,7 +513,7 @@ export function AdvancedCalculator() {
                   <h4 className="font-bold text-emerald-900 mb-3">Rendimiento</h4>
                   <p className="text-2xl font-bold text-emerald-700">
                     {(
-                      (completeResult.totalInterest / (completePrincipal + completeResult.totalContributions)) *
+                      (completeResult.totalInterest / (completePrincipal.numericValue + completeResult.totalContributions)) *
                       100
                     ).toFixed(2)}
                     %
