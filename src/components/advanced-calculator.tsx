@@ -405,7 +405,25 @@ export function AdvancedCalculator() {
                         </div>
 
                         {/* Información adicional */}
-                        {contribResult.discrete.finalBalance > 0 && (
+                        {contribResult.discrete.finalBalance === 0 && contribResult.discrete.monthsUsed && contribResult.discrete.monthsUsed < (years.numericValue * 12) ? (
+                          // Préstamo liquidado antes del plazo
+                          <div className="pt-2 border-t border-gray-200">
+                            <p className="text-xs text-gray-600 mb-2">Información del pago anticipado:</p>
+                            <div className="bg-gray-50 p-2 rounded space-y-1 text-xs text-gray-700">
+                              <div className="flex justify-between">
+                                <span>Tiempo de pago:</span>
+                                <span className="font-semibold">{contribResult.discrete.monthsUsed} mes{contribResult.discrete.monthsUsed !== 1 ? 'es' : ''} de {years.numericValue * 12} programados</span>
+                              </div>
+                              {contribResult.discrete.lastPaymentAdjusted && (
+                                <div className="flex justify-between">
+                                  <span>Último pago ajustado:</span>
+                                  <span className="font-semibold">{formatCurrency(contribResult.discrete.lastPaymentAdjusted)} de {formatCurrency(monthlyContribution.numericValue)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : contribResult.discrete.finalBalance > 0 && (
+                          // Deuda pendiente
                           <div className="pt-2 border-t border-gray-200">
                             <p className="text-xs text-gray-600 mb-2">Opciones para liquidar la deuda:</p>
                             <div className="bg-gray-50 p-2 rounded space-y-1 text-xs text-gray-700">
@@ -508,7 +526,25 @@ export function AdvancedCalculator() {
                         </div>
 
                         {/* Información adicional */}
-                        {contribResult.continuous.finalBalance > 0 && (
+                        {contribResult.continuous.finalBalance === 0 && contribResult.continuous.monthsUsed && contribResult.continuous.monthsUsed < (years.numericValue * 12) ? (
+                          // Préstamo liquidado antes del plazo
+                          <div className="pt-2 border-t border-gray-200">
+                            <p className="text-xs text-gray-600 mb-2">Información del pago anticipado:</p>
+                            <div className="bg-gray-50 p-2 rounded space-y-1 text-xs text-gray-700">
+                              <div className="flex justify-between">
+                                <span>Tiempo de pago:</span>
+                                <span className="font-semibold">{contribResult.continuous.monthsUsed} mes{contribResult.continuous.monthsUsed !== 1 ? 'es' : ''} de {years.numericValue * 12} programados</span>
+                              </div>
+                              {contribResult.continuous.lastPaymentAdjusted && (
+                                <div className="flex justify-between">
+                                  <span>Último pago ajustado:</span>
+                                  <span className="font-semibold">{formatCurrency(contribResult.continuous.lastPaymentAdjusted)} de {formatCurrency(monthlyContribution.numericValue)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : contribResult.continuous.finalBalance > 0 && (
+                          // Deuda pendiente
                           <div className="pt-2 border-t border-gray-200">
                             <p className="text-xs text-gray-600 mb-2">Opciones para liquidar la deuda:</p>
                             <div className="bg-gray-50 p-2 rounded space-y-1 text-xs text-gray-700">
@@ -850,27 +886,49 @@ export function AdvancedCalculator() {
                   </div>
                 )}
 
-                {/* Información adicional (solo en modo préstamo con deuda pendiente) */}
-                {isLoanResult(completeResult) && completeResult.finalBalance > 0 && (
-                  <div className="pt-2 border-t border-gray-200">
-                    <p className="text-xs text-gray-600 mb-2">Opciones para liquidar la deuda:</p>
-                    <div className="bg-gray-50 p-3 rounded space-y-1 text-xs text-gray-700">
-                      <div className="flex justify-between">
-                        <span>Pago único:</span>
-                        <span className="font-semibold">{formatCurrency(completeResult.finalBalance)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Cuota necesaria:</span>
-                        <span className="font-semibold">{formatCurrency(calculateRequiredPayment(completePrincipal.numericValue, completeRatePeriods[0].rate, completeRatePeriods.reduce((sum, p) => sum + p.years, 0)))}/mes</span>
-                      </div>
-                      {calculateAdditionalMonths(completeResult.finalBalance, completeContribution.numericValue, completeRatePeriods[completeRatePeriods.length - 1].rate) !== Infinity && (
-                        <div className="flex justify-between">
-                          <span>Meses adicionales (cuota actual):</span>
-                          <span className="font-semibold">{calculateAdditionalMonths(completeResult.finalBalance, completeContribution.numericValue, completeRatePeriods[completeRatePeriods.length - 1].rate)} meses</span>
+                {/* Información adicional (solo en modo préstamo) */}
+                {isLoanResult(completeResult) && (
+                  <>
+                    {completeResult.finalBalance === 0 && completeResult.monthsUsed && completeResult.monthsUsed < (completeRatePeriods.reduce((sum, p) => sum + p.years, 0) * 12) ? (
+                      // Préstamo liquidado antes del plazo
+                      <div className="pt-2 border-t border-gray-200">
+                        <p className="text-xs text-gray-600 mb-2">Información del pago anticipado:</p>
+                        <div className="bg-gray-50 p-3 rounded space-y-1 text-xs text-gray-700">
+                          <div className="flex justify-between">
+                            <span>Tiempo de pago:</span>
+                            <span className="font-semibold">{completeResult.monthsUsed} mes{completeResult.monthsUsed !== 1 ? 'es' : ''} de {completeRatePeriods.reduce((sum, p) => sum + p.years, 0) * 12} programados</span>
+                          </div>
+                          {completeResult.lastPaymentAdjusted && (
+                            <div className="flex justify-between">
+                              <span>Último pago ajustado:</span>
+                              <span className="font-semibold">{formatCurrency(completeResult.lastPaymentAdjusted)} de {formatCurrency(completeContribution.numericValue)}</span>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </div>
+                      </div>
+                    ) : completeResult.finalBalance > 0 && (
+                      // Deuda pendiente
+                      <div className="pt-2 border-t border-gray-200">
+                        <p className="text-xs text-gray-600 mb-2">Opciones para liquidar la deuda:</p>
+                        <div className="bg-gray-50 p-3 rounded space-y-1 text-xs text-gray-700">
+                          <div className="flex justify-between">
+                            <span>Pago único:</span>
+                            <span className="font-semibold">{formatCurrency(completeResult.finalBalance)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Cuota necesaria:</span>
+                            <span className="font-semibold">{formatCurrency(calculateRequiredPayment(completePrincipal.numericValue, completeRatePeriods[0].rate, completeRatePeriods.reduce((sum, p) => sum + p.years, 0)))}/mes</span>
+                          </div>
+                          {calculateAdditionalMonths(completeResult.finalBalance, completeContribution.numericValue, completeRatePeriods[completeRatePeriods.length - 1].rate) !== Infinity && (
+                            <div className="flex justify-between">
+                              <span>Meses adicionales (cuota actual):</span>
+                              <span className="font-semibold">{calculateAdditionalMonths(completeResult.finalBalance, completeContribution.numericValue, completeRatePeriods[completeRatePeriods.length - 1].rate)} meses</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 

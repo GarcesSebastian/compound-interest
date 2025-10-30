@@ -22,6 +22,8 @@ export interface LoanResult {
   totalInterest: number // Total de intereses pagados
   principalPaid: number // Capital amortizado
   warning?: string // Advertencia si los pagos no cubren intereses
+  monthsUsed?: number // Meses reales utilizados para pagar
+  lastPaymentAdjusted?: number // Monto del último pago ajustado
 }
 
 /**
@@ -293,6 +295,8 @@ export function calculateLoanWithPayments(
   let totalInterest = 0
   let totalPaid = 0
   let warning: string | undefined
+  let monthsUsed = 0
+  let lastPaymentAdjusted: number | undefined
 
   // Simular cada período
   for (let i = 0; i < totalPeriods; i++) {
@@ -308,10 +312,13 @@ export function calculateLoanWithPayments(
     // Aplicar pago
     balance = balance + interestThisPeriod - regularPayment
     totalPaid += regularPayment
+    monthsUsed++
 
     // Si el saldo se vuelve negativo (pagaste de más)
     if (balance < 0) {
       // Ajustar el último pago
+      const overpayment = -balance
+      lastPaymentAdjusted = regularPayment - overpayment
       totalPaid += balance // balance es negativo, así que esto resta
       balance = 0
       break
@@ -326,6 +333,8 @@ export function calculateLoanWithPayments(
     totalInterest,
     principalPaid,
     warning,
+    monthsUsed,
+    lastPaymentAdjusted,
   }
 }
 
@@ -352,6 +361,8 @@ export function calculateContinuousLoanWithPayments(
   let totalInterest = 0
   let totalPaid = 0
   let warning: string | undefined
+  let monthsUsed = 0
+  let lastPaymentAdjusted: number | undefined
 
   // Simular cada período
   for (let i = 0; i < totalPeriods; i++) {
@@ -367,9 +378,12 @@ export function calculateContinuousLoanWithPayments(
     // Aplicar pago
     balance = balance + interestThisPeriod - regularPayment
     totalPaid += regularPayment
+    monthsUsed++
 
     // Si el saldo se vuelve negativo (pagaste de más)
     if (balance < 0) {
+      const overpayment = -balance
+      lastPaymentAdjusted = regularPayment - overpayment
       totalPaid += balance // balance es negativo
       balance = 0
       break
@@ -384,6 +398,8 @@ export function calculateContinuousLoanWithPayments(
     totalInterest,
     principalPaid,
     warning,
+    monthsUsed,
+    lastPaymentAdjusted,
   }
 }
 
@@ -405,6 +421,8 @@ export function calculateVariableRatesLoanWithPayments(
   let totalInterest = 0
   let totalPaid = 0
   let warning: string | undefined
+  let monthsUsed = 0
+  let lastPaymentAdjusted: number | undefined
 
   // Procesar cada período de tasa
   for (const period of ratePeriods) {
@@ -423,8 +441,11 @@ export function calculateVariableRatesLoanWithPayments(
 
       balance = balance + interestThisPeriod - regularPayment
       totalPaid += regularPayment
+      monthsUsed++
 
       if (balance < 0) {
+        const overpayment = -balance
+        lastPaymentAdjusted = regularPayment - overpayment
         totalPaid += balance
         balance = 0
         break
@@ -442,5 +463,7 @@ export function calculateVariableRatesLoanWithPayments(
     totalInterest,
     principalPaid,
     warning,
+    monthsUsed,
+    lastPaymentAdjusted,
   }
 }
