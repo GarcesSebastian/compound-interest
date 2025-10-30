@@ -16,6 +16,14 @@ export interface ContributionResult {
   netReturn: number
 }
 
+export interface LoanResult {
+  finalBalance: number // Saldo final (deuda restante)
+  totalPaid: number // Total pagado
+  totalInterest: number // Total de intereses pagados
+  principalPaid: number // Capital amortizado
+  warning?: string // Advertencia si los pagos no cubren intereses
+}
+
 /**
  * Calculate compound interest using discrete model
  * P(t) = P₀ × (1 + r/n)^(nt)
@@ -109,17 +117,17 @@ export function calculateWithContributions(
  * @param principal - Capital inicial
  * @param annualRate - Tasa anual en porcentaje
  * @param years - Años
- * @param continuousContribution - Tasa de aporte continuo (COP/año)
+ * @param monthlyContribution - Aporte mensual (COP/mes)
  */
 export function calculateContinuousWithContributions(
   principal: number,
   annualRate: number,
   years: number,
-  continuousContribution: number,
+  monthlyContribution: number,
 ): ContributionResult {
   const r = annualRate / 100
   const t = years
-  const a = continuousContribution
+  const a = monthlyContribution * 12 // Convertir aporte mensual a anual
 
   // Valor futuro del capital inicial
   const principalFV = principal * Math.exp(r * t)
@@ -128,7 +136,7 @@ export function calculateContinuousWithContributions(
   const contributionFV = (a / r) * (Math.exp(r * t) - 1)
 
   const finalAmount = principalFV + contributionFV
-  const totalContributions = a * t
+  const totalContributions = monthlyContribution * 12 * t // Total aportado correctamente
   const totalInterest = finalAmount - principal - totalContributions
   const netReturn = totalInterest
 
@@ -257,5 +265,182 @@ export function calculateVariableRatesWithContributions(
     totalContributions,
     totalInterest,
     netReturn: totalInterest,
+  }
+}
+
+/**
+ * Calculate loan with regular payments (Discrete Model)
+ * Cada período: nuevo_saldo = saldo_anterior × (1 + r/n) - pago
+ * @param principal - Deuda inicial
+ * @param annualRate - Tasa anual en porcentaje
+ * @param years - Años
+ * @param compoundingFrequency - Frecuencia de capitalización (12 para mensual)
+ * @param regularPayment - Pago regular al final de cada período
+ */
+export function calculateLoanWithPayments(
+  principal: number,
+  annualRate: number,
+  years: number,
+  compoundingFrequency: number,
+  regularPayment: number,
+): LoanResult {
+  const r = annualRate / 100
+  const n = compoundingFrequency
+  const totalPeriods = n * years
+  const periodRate = r / n
+
+  let balance = principal
+  let totalInterest = 0
+  let totalPaid = 0
+  let warning: string | undefined
+
+  // Simular cada período
+  for (let i = 0; i < totalPeriods; i++) {
+    // Calcular interés del período
+    const interestThisPeriod = balance * periodRate
+    totalInterest += interestThisPeriod
+
+    // Verificar si el pago cubre al menos los intereses
+    if (regularPayment < interestThisPeriod && !warning) {
+      warning = "Los pagos no cubren los intereses, la deuda crecerá"
+    }
+
+    // Aplicar pago
+    balance = balance + interestThisPeriod - regularPayment
+    totalPaid += regularPayment
+
+    // Si el saldo se vuelve negativo (pagaste de más)
+    if (balance < 0) {
+      // Ajustar el último pago
+      totalPaid += balance // balance es negativo, así que esto resta
+      balance = 0
+      break
+    }
+  }
+
+  const principalPaid = principal - balance
+
+  return {
+    finalBalance: Math.max(0, balance),
+    totalPaid,
+    totalInterest,
+    principalPaid,
+    warning,
+  }
+}
+
+/**
+ * Calculate loan with regular payments (Continuous Model)
+ * Cada período: nuevo_saldo = saldo_anterior × e^(r/n) - pago
+ * @param principal - Deuda inicial
+ * @param annualRate - Tasa anual en porcentaje
+ * @param years - Años
+ * @param regularPayment - Pago anual continuo
+ */
+export function calculateContinuousLoanWithPayments(
+  principal: number,
+  annualRate: number,
+  years: number,
+  regularPayment: number,
+): LoanResult {
+  const r = annualRate / 100
+  const n = 12 // Simulamos mensualmente para el modelo continuo
+  const totalPeriods = n * years
+  const periodRate = r / n
+
+  let balance = principal
+  let totalInterest = 0
+  let totalPaid = 0
+  let warning: string | undefined
+
+  // Simular cada período
+  for (let i = 0; i < totalPeriods; i++) {
+    // Calcular interés continuo del período
+    const interestThisPeriod = balance * (Math.exp(periodRate) - 1)
+    totalInterest += interestThisPeriod
+
+    // Verificar si el pago cubre al menos los intereses
+    if (regularPayment < interestThisPeriod && !warning) {
+      warning = "Los pagos no cubren los intereses, la deuda crecerá"
+    }
+
+    // Aplicar pago
+    balance = balance + interestThisPeriod - regularPayment
+    totalPaid += regularPayment
+
+    // Si el saldo se vuelve negativo (pagaste de más)
+    if (balance < 0) {
+      totalPaid += balance // balance es negativo
+      balance = 0
+      break
+    }
+  }
+
+  const principalPaid = principal - balance
+
+  return {
+    finalBalance: Math.max(0, balance),
+    totalPaid,
+    totalInterest,
+    principalPaid,
+    warning,
+  }
+}
+
+/**
+ * Calculate loan with variable rates and regular payments
+ * @param principal - Deuda inicial
+ * @param ratePeriods - Array de períodos con sus tasas y duraciones
+ * @param compoundingFrequency - Frecuencia de capitalización (12 para mensual)
+ * @param regularPayment - Pago regular
+ */
+export function calculateVariableRatesLoanWithPayments(
+  principal: number,
+  ratePeriods: RatePeriod[],
+  compoundingFrequency: number,
+  regularPayment: number,
+): LoanResult {
+  const n = compoundingFrequency
+  let balance = principal
+  let totalInterest = 0
+  let totalPaid = 0
+  let warning: string | undefined
+
+  // Procesar cada período de tasa
+  for (const period of ratePeriods) {
+    const r = period.rate / 100
+    const periodRate = r / n
+    const periodsInThisRate = n * period.years
+
+    // Simular cada subperíodo dentro de este período de tasa
+    for (let i = 0; i < periodsInThisRate; i++) {
+      const interestThisPeriod = balance * periodRate
+      totalInterest += interestThisPeriod
+
+      if (regularPayment < interestThisPeriod && !warning) {
+        warning = "Los pagos no cubren los intereses, la deuda crecerá"
+      }
+
+      balance = balance + interestThisPeriod - regularPayment
+      totalPaid += regularPayment
+
+      if (balance < 0) {
+        totalPaid += balance
+        balance = 0
+        break
+      }
+    }
+
+    if (balance === 0) break
+  }
+
+  const principalPaid = principal - balance
+
+  return {
+    finalBalance: Math.max(0, balance),
+    totalPaid,
+    totalInterest,
+    principalPaid,
+    warning,
   }
 }
