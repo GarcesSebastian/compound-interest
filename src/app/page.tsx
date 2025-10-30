@@ -8,6 +8,7 @@ import { BankComparison } from "@/components/bank-comparison"
 import { RateUpdater } from "@/components/rate-updater"
 import { Button } from "@/components/ui/button"
 import { RefreshCw } from "lucide-react"
+import { LoanModeProvider } from "@/contexts/loan-mode-context"
 
 type Section = "calculator" | "advanced" | "math" | "comparison"
 
@@ -24,6 +25,7 @@ export default function Home() {
   }
 
   return (
+    <LoanModeProvider>
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-[#DC2626] text-white shadow-xl">
@@ -124,5 +126,6 @@ export default function Home() {
 
       {showRateUpdater && <RateUpdater onClose={() => setShowRateUpdater(false)} onUpdate={handleUpdateRates} />}
     </div>
+    </LoanModeProvider>
   )
 }

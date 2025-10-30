@@ -22,6 +22,10 @@ export function Math({ children, block = false, className = "" }: MathProps) {
           throwOnError: false,
           trust: true,
           output: "html",
+          strict: false,
+          macros: {
+            "\\RR": "\\mathbb{R}",
+          },
         })
       } catch (error) {
         console.error("KaTeX rendering error:", error)
@@ -33,10 +37,10 @@ export function Math({ children, block = false, className = "" }: MathProps) {
   }, [children, block])
 
   if (block) {
-    return <div ref={divRef} className={`overflow-x-auto text-center py-2 ${className}`} />
+    return <div ref={divRef} className={`overflow-x-auto text-center py-4 text-lg sm:text-xl md:text-2xl ${className}`} />
   }
 
-  return <span ref={spanRef} className={className} />
+  return <span ref={spanRef} className={`text-base ${className}`} />
 }
 
 interface BlockMathProps {

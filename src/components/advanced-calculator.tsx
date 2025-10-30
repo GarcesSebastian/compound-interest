@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,11 +16,13 @@ import { formatCurrency } from "@/lib/utils"
 import { PlusCircle, Calculator as CalcIcon } from "lucide-react"
 import { useNumericInput } from "@/hooks/use-numeric-input"
 import { RatePeriodInput } from "@/components/rate-period-input"
+import { useLoanMode } from "@/contexts/loan-mode-context"
 
 type CalculatorMode = "contributions" | "variableRates" | "complete"
 
 export function AdvancedCalculator() {
   const [mode, setMode] = useState<CalculatorMode>("contributions")
+  const { isLoanMode, setIsLoanMode } = useLoanMode()
 
   // Contributions state with flexible inputs
   const principal = useNumericInput(5000000, 0)
@@ -50,12 +52,13 @@ export function AdvancedCalculator() {
   const [completeResult, setCompleteResult] = useState<any>(null)
 
   const calculateContributions = () => {
-    const discrete = calculateWithContributions(principal.numericValue, annualRate.numericValue, years.numericValue, 12, monthlyContribution.numericValue)
+    const contributionAmount = isLoanMode ? -monthlyContribution.numericValue : monthlyContribution.numericValue
+    const discrete = calculateWithContributions(principal.numericValue, annualRate.numericValue, years.numericValue, 12, contributionAmount)
     const continuous = calculateContinuousWithContributions(
       principal.numericValue,
       annualRate.numericValue,
       years.numericValue,
-      monthlyContribution.numericValue * 12,
+      contributionAmount * 12,
     )
     setContribResult({ discrete, continuous })
   }
@@ -66,11 +69,12 @@ export function AdvancedCalculator() {
   }
 
   const calculateComplete = () => {
+    const contributionAmount = isLoanMode ? -completeContribution.numericValue : completeContribution.numericValue
     const result = calculateVariableRatesWithContributions(
       completePrincipal.numericValue,
       completeRatePeriods,
       12,
-      completeContribution.numericValue,
+      contributionAmount,
     )
     setCompleteResult(result)
   }
@@ -115,6 +119,19 @@ export function AdvancedCalculator() {
     setCompleteRatePeriods(updated)
   }
 
+  // Auto-recalculate when loan mode changes if results exist
+  useEffect(() => {
+    if (contribResult) {
+      calculateContributions()
+    }
+  }, [isLoanMode])
+
+  useEffect(() => {
+    if (completeResult) {
+      calculateComplete()
+    }
+  }, [isLoanMode])
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Mode Selection */}
@@ -151,11 +168,39 @@ export function AdvancedCalculator() {
       {mode === "contributions" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Card className="shadow-lg">
-            <CardHeader className="bg-cyan-50">
+            <CardHeader className="bg-white border-b border-gray-200">
               <CardTitle className="text-lg sm:text-xl">Calculadora con Aportes Regulares</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Modelo discreto y continuo</CardDescription>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
+              {/* Mode Toggle */}
+              <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border-l-4 border-[#DC2626]">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-sm">Contexto</h4>
+                    <p className="text-xs text-gray-600">{isLoanMode ? "Pagos reducen deuda" : "Aportes aumentan capital"}</p>
+                  </div>
+                  <div className="flex items-center gap-0 border-2 border-gray-300 rounded-md overflow-hidden">
+                    <button
+                      onClick={() => setIsLoanMode(false)}
+                      className={`px-3 py-1.5 text-xs font-semibold transition-all ${
+                        !isLoanMode ? "bg-[#DC2626] text-white" : "bg-white text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      Ahorro
+                    </button>
+                    <button
+                      onClick={() => setIsLoanMode(true)}
+                      className={`px-3 py-1.5 text-xs font-semibold transition-all border-l-2 border-gray-300 ${
+                        isLoanMode ? "bg-[#DC2626] text-white" : "bg-white text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      Préstamo
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="contrib-principal" className="text-sm font-semibold">
                   Capital Inicial (COP)
@@ -225,77 +270,50 @@ export function AdvancedCalculator() {
           </Card>
 
           {contribResult && (
-            <Card className="shadow-lg border-2 border-cyan-300">
-              <CardHeader className="bg-gradient-to-br from-cyan-50 to-teal-50">
-                <CardTitle className="text-lg sm:text-xl">Resultados</CardTitle>
-                <CardDescription className="text-xs sm:text-sm">Comparación de modelos</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
-                  <h4 className="font-bold text-blue-900 mb-3">Modelo Discreto (Real)</h4>
+            <div className="space-y-4">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900">Resultados</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="bg-white p-4 sm:p-5 border-l-4 border-[#DC2626] shadow-sm rounded-lg">
+                  <h4 className="font-bold text-gray-900 mb-3 text-base">Modelo Discreto (Real)</h4>
                   <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span className="text-gray-600">Valor Final:</span>
-                      <span className="font-bold text-blue-900">{formatCurrency(contribResult.discrete.finalAmount)}</span>
+                      <span className="font-bold text-gray-900 text-base">{formatCurrency(contribResult.discrete.finalAmount)}</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span className="text-gray-600">Total Aportado:</span>
                       <span className="font-semibold">{formatCurrency(principal.numericValue + contribResult.discrete.totalContributions)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Intereses Ganados:</span>
-                      <span className="font-semibold text-green-600">
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                      <span className="text-gray-700 font-medium">Intereses:</span>
+                      <span className="font-bold text-[#DC2626]">
                         {formatCurrency(contribResult.discrete.totalInterest)}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-teal-50 rounded-lg p-4 border-2 border-teal-200">
-                  <h4 className="font-bold text-teal-900 mb-3">Modelo Continuo (Teórico)</h4>
+                <div className="bg-white p-4 sm:p-5 border-l-4 border-gray-400 shadow-sm rounded-lg">
+                  <h4 className="font-bold text-gray-900 mb-3 text-base">Modelo Continuo (Teórico)</h4>
                   <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span className="text-gray-600">Valor Final:</span>
-                      <span className="font-bold text-teal-900">{formatCurrency(contribResult.continuous.finalAmount)}</span>
+                      <span className="font-bold text-gray-900 text-base">{formatCurrency(contribResult.continuous.finalAmount)}</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span className="text-gray-600">Total Aportado:</span>
                       <span className="font-semibold">{formatCurrency(principal.numericValue + contribResult.continuous.totalContributions)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Intereses Ganados:</span>
-                      <span className="font-semibold text-green-600">
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                      <span className="text-gray-700 font-medium">Intereses:</span>
+                      <span className="font-bold text-[#DC2626]">
                         {formatCurrency(contribResult.continuous.totalInterest)}
                       </span>
                     </div>
                   </div>
                 </div>
-
-                <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg p-4 border-2 border-green-300">
-                  <h4 className="font-bold text-green-900 mb-2">Resumen</h4>
-                  <div className="space-y-1 text-sm">
-                    <p className="text-gray-700">
-                      Capital inicial: <span className="font-semibold">{formatCurrency(principal.numericValue)}</span>
-                    </p>
-                    <p className="text-gray-700">
-                      Total invertido:{" "}
-                      <span className="font-semibold">
-                        {formatCurrency(principal.numericValue + contribResult.discrete.totalContributions)}
-                      </span>
-                    </p>
-                    <p className="text-green-900 font-bold text-base mt-2">
-                      Rendimiento:{" "}
-                      {(
-                        (contribResult.discrete.totalInterest /
-                          (principal.numericValue + contribResult.discrete.totalContributions)) *
-                        100
-                      ).toFixed(2)}
-                      %
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -304,7 +322,7 @@ export function AdvancedCalculator() {
       {mode === "variableRates" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Card className="shadow-lg">
-            <CardHeader className="bg-amber-50">
+            <CardHeader className="bg-white border-b border-gray-200">
               <CardTitle className="text-lg sm:text-xl">Calculadora con Tasas Variables</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Múltiples períodos con diferentes tasas</CardDescription>
             </CardHeader>
@@ -360,50 +378,46 @@ export function AdvancedCalculator() {
           </Card>
 
           {varRatesResult && (
-            <Card className="shadow-lg border-2 border-amber-300">
-              <CardHeader className="bg-gradient-to-br from-amber-50 to-orange-50">
-                <CardTitle className="text-lg sm:text-xl">Resultado</CardTitle>
-                <CardDescription className="text-xs sm:text-sm">Cálculo con tasas variables</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <div className="bg-gradient-to-br from-orange-100 to-amber-100 rounded-lg p-5 border-2 border-orange-300">
-                  <h4 className="font-bold text-orange-900 mb-4 text-lg">Monto Final</h4>
-                  <p className="text-3xl font-bold text-[#DC2626] mb-3">{formatCurrency(varRatesResult.finalAmount)}</p>
-                  <div className="space-y-2 text-sm border-t-2 border-orange-200 pt-3">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Capital Inicial:</span>
-                      <span className="font-semibold">{formatCurrency(varPrincipal.numericValue)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Intereses Totales:</span>
-                      <span className="font-bold text-red-600">{formatCurrency(varRatesResult.totalInterest)}</span>
-                    </div>
+            <div className="space-y-4">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900">Resultados</h3>
+              
+              <div className="bg-white p-5 sm:p-6 border-l-4 border-[#DC2626] shadow-lg rounded-lg">
+                <div className="flex items-baseline gap-2 mb-4">
+                  <h4 className="font-bold text-gray-900 text-base">Valor Final:</h4>
+                  <p className="text-2xl sm:text-3xl font-bold text-[#DC2626]">{formatCurrency(varRatesResult.finalAmount)}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 text-sm border-t border-gray-200 pt-4">
+                  <div className="flex justify-between sm:flex-col sm:gap-1">
+                    <span className="text-gray-600">Capital Inicial:</span>
+                    <span className="font-semibold text-gray-900">{formatCurrency(varPrincipal.numericValue)}</span>
+                  </div>
+                  <div className="flex justify-between sm:flex-col sm:gap-1">
+                    <span className="text-gray-600">Intereses Totales:</span>
+                    <span className="font-bold text-[#DC2626]">{formatCurrency(varRatesResult.totalInterest)}</span>
                   </div>
                 </div>
+              </div>
 
-                <div className="bg-yellow-50 rounded-lg p-4 border-2 border-yellow-200">
-                  <h4 className="font-bold text-yellow-900 mb-3">Estructura de Tasas</h4>
-                  <div className="space-y-2">
-                    {ratePeriods.map((period, index) => (
-                      <div key={index} className="flex justify-between text-sm">
-                        <span className="text-gray-700">
-                          {period.years === 1 ? "Año" : "Años"} {index === 0 ? "1" : index === 1 ? "2" : `${index + 1}`}
-                          {period.years > 1 ? `-${index + period.years}` : ""}:
-                        </span>
-                        <span className="font-semibold text-yellow-900">{period.rate}% E.A.</span>
-                      </div>
-                    ))}
-                  </div>
+              <div className="bg-white p-4 sm:p-5 border-l-4 border-gray-400 shadow-sm rounded-lg">
+                <div className="flex items-baseline justify-between mb-3">
+                  <h4 className="font-bold text-gray-900 text-base">Estructura de Tasas</h4>
+                  <span className="text-sm font-bold text-[#DC2626]">
+                    Total: {ratePeriods.reduce((sum, p) => sum + p.years, 0)} años
+                  </span>
                 </div>
-
-                <div className="bg-white rounded-lg p-4 border-2 border-gray-200">
-                  <h4 className="font-bold text-gray-900 mb-2 text-sm">Tiempo Total</h4>
-                  <p className="text-2xl font-bold text-[#DC2626]">
-                    {ratePeriods.reduce((sum, p) => sum + p.years, 0)} años
-                  </p>
+                <div className="space-y-2">
+                  {ratePeriods.map((period, index) => (
+                    <div key={index} className="flex justify-between items-center text-sm py-1">
+                      <span className="text-gray-700">
+                        Período {index + 1} ({period.years} {period.years === 1 ? "año" : "años"})
+                      </span>
+                      <span className="font-semibold text-gray-900">{period.rate}% E.A.</span>
+                    </div>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -412,11 +426,39 @@ export function AdvancedCalculator() {
       {mode === "complete" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Card className="shadow-lg">
-            <CardHeader className="bg-gradient-to-br from-rose-50 to-pink-50">
+            <CardHeader className="bg-white border-b border-gray-200">
               <CardTitle className="text-lg sm:text-xl">Modelo Completo</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Tasas variables + Aportes periódicos</CardDescription>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
+              {/* Mode Toggle */}
+              <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border-l-4 border-[#DC2626]">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+                  <div>
+                    <h4 className="font-semibold text-gray-900 text-sm">Contexto</h4>
+                    <p className="text-xs text-gray-600">{isLoanMode ? "Pagos reducen deuda" : "Aportes aumentan capital"}</p>
+                  </div>
+                  <div className="flex items-center gap-0 border-2 border-gray-300 rounded-md overflow-hidden">
+                    <button
+                      onClick={() => setIsLoanMode(false)}
+                      className={`px-3 py-1.5 text-xs font-semibold transition-all ${
+                        !isLoanMode ? "bg-[#DC2626] text-white" : "bg-white text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      Ahorro
+                    </button>
+                    <button
+                      onClick={() => setIsLoanMode(true)}
+                      className={`px-3 py-1.5 text-xs font-semibold transition-all border-l-2 border-gray-300 ${
+                        isLoanMode ? "bg-[#DC2626] text-white" : "bg-white text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      Préstamo
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="complete-principal" className="text-sm font-semibold">
                   Capital Inicial (COP)
@@ -483,67 +525,51 @@ export function AdvancedCalculator() {
           </Card>
 
           {completeResult && (
-            <Card className="shadow-lg border-2 border-rose-300">
-              <CardHeader className="bg-gradient-to-br from-rose-50 to-pink-50">
-                <CardTitle className="text-lg sm:text-xl">Resultado Completo</CardTitle>
-                <CardDescription className="text-xs sm:text-sm">Análisis detallado</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg p-5 border-2 border-purple-300">
-                  <h4 className="font-bold text-purple-900 mb-4 text-lg">Valor Final</h4>
-                  <p className="text-3xl font-bold text-[#DC2626] mb-4">{formatCurrency(completeResult.finalAmount)}</p>
-                  
-                  <div className="space-y-2 text-sm border-t-2 border-purple-200 pt-3">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Capital Inicial:</span>
-                      <span className="font-semibold">{formatCurrency(completePrincipal.numericValue)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Total Aportado:</span>
-                      <span className="font-semibold">{formatCurrency(completePrincipal.numericValue + completeResult.totalContributions)}</span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t border-purple-200">
-                      <span className="text-gray-700 font-semibold">Intereses Ganados:</span>
-                      <span className="font-bold text-green-600">{formatCurrency(completeResult.totalInterest)}</span>
-                    </div>
+            <div className="space-y-4">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900">Resultado Completo</h3>
+              
+              <div className="bg-white p-5 sm:p-6 border-l-4 border-[#DC2626] shadow-lg rounded-lg">
+                <div className="flex items-baseline gap-2 mb-4">
+                  <h4 className="font-bold text-gray-900 text-base">Valor Final:</h4>
+                  <p className="text-2xl sm:text-3xl font-bold text-[#DC2626]">{formatCurrency(completeResult.finalAmount)}</p>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm border-t border-gray-200 pt-4">
+                  <div className="flex justify-between sm:flex-col sm:gap-1">
+                    <span className="text-gray-600">Capital Inicial:</span>
+                    <span className="font-semibold text-gray-900">{formatCurrency(completePrincipal.numericValue)}</span>
+                  </div>
+                  <div className="flex justify-between sm:flex-col sm:gap-1">
+                    <span className="text-gray-600">{isLoanMode ? "Total Pagado:" : "Total Aportado:"}</span>
+                    <span className="font-semibold text-gray-900">{formatCurrency(completePrincipal.numericValue + completeResult.totalContributions)}</span>
+                  </div>
+                  <div className="flex justify-between sm:flex-col sm:gap-1 sm:col-span-2 pt-2 border-t border-gray-200">
+                    <span className="text-gray-700 font-medium">{isLoanMode ? "Intereses Cobrados:" : "Intereses Ganados:"}</span>
+                    <span className="font-bold text-[#DC2626] text-base">{formatCurrency(completeResult.totalInterest)}</span>
                   </div>
                 </div>
+              </div>
 
-                <div className="bg-emerald-50 rounded-lg p-4 border-2 border-emerald-200">
-                  <h4 className="font-bold text-emerald-900 mb-3">Rendimiento</h4>
-                  <p className="text-2xl font-bold text-emerald-700">
-                    {(
-                      (completeResult.totalInterest / (completePrincipal.numericValue + completeResult.totalContributions)) *
-                      100
-                    ).toFixed(2)}
-                    %
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">Sobre el total invertido</p>
-                </div>
-
-                <div className="bg-violet-50 rounded-lg p-4 border-2 border-violet-200">
-                  <h4 className="font-bold text-violet-900 mb-3">Estructura de Tasas</h4>
-                  <div className="space-y-2">
-                    {completeRatePeriods.map((period, index) => (
-                      <div key={index} className="flex justify-between text-sm">
-                        <span className="text-gray-700">
-                          Período {index + 1} ({period.years} {period.years === 1 ? "año" : "años"}):
-                        </span>
-                        <span className="font-semibold text-violet-900">{period.rate}% E.A.</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-violet-200">
-                    <div className="flex justify-between text-sm font-bold">
-                      <span>Tiempo Total:</span>
-                      <span className="text-[#DC2626]">
-                        {completeRatePeriods.reduce((sum, p) => sum + p.years, 0)} años
+              <div className="bg-white p-4 sm:p-5 border-l-4 border-gray-400 shadow-sm rounded-lg">
+                <h4 className="font-bold text-gray-900 mb-3 text-base">Estructura de Tasas</h4>
+                <div className="space-y-2">
+                  {completeRatePeriods.map((period, index) => (
+                    <div key={index} className="flex justify-between items-center text-sm py-1">
+                      <span className="text-gray-700">
+                        Período {index + 1} ({period.years} {period.years === 1 ? "año" : "años"})
                       </span>
+                      <span className="font-semibold text-gray-900">{period.rate}% E.A.</span>
                     </div>
+                  ))}
+                  <div className="flex justify-between items-center pt-2 border-t border-gray-300">
+                    <span className="font-bold text-gray-900 text-sm">Tiempo Total:</span>
+                    <span className="font-bold text-[#DC2626] text-sm">
+                      {completeRatePeriods.reduce((sum, p) => sum + p.years, 0)} años
+                    </span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </div>
       )}

@@ -102,38 +102,38 @@ export function BankComparison({ capital, years, refreshKey }: BankComparisonPro
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-          <Card className="shadow-lg border-2 border-green-300 bg-green-50">
+          <Card className="shadow-lg border-l-4 border-green-500 bg-white">
             <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-green-900 text-base sm:text-lg">Mejor Opción</CardTitle>
+              <CardTitle className="text-gray-900 text-base sm:text-lg">Mejor Opción</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Menor costo total</CardDescription>
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0">
-              <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700 mb-1 sm:mb-2 truncate">{bestOption.name}</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1 sm:mb-2 truncate">{bestOption.name}</p>
               <p className="text-xs sm:text-sm text-gray-600">Tasa: {bestOption.rate}% E.A.</p>
-              <p className="text-base sm:text-lg font-semibold text-green-900 mt-2 sm:mt-3 break-words">{formatCurrency(bestOption.finalAmount)}</p>
+              <p className="text-base sm:text-lg font-semibold text-green-600 mt-2 sm:mt-3 break-words">{formatCurrency(bestOption.finalAmount)}</p>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-2 border-red-300 bg-red-50">
+          <Card className="shadow-lg border-l-4 border-gray-400 bg-white">
             <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-red-900 text-base sm:text-lg">Opción Más Costosa</CardTitle>
+              <CardTitle className="text-gray-900 text-base sm:text-lg">Opción Más Costosa</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Mayor costo total</CardDescription>
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0">
-              <p className="text-lg sm:text-xl md:text-2xl font-bold text-red-700 mb-1 sm:mb-2 truncate">{worstOption.name}</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1 sm:mb-2 truncate">{worstOption.name}</p>
               <p className="text-xs sm:text-sm text-gray-600">Tasa: {worstOption.rate}% E.A.</p>
-              <p className="text-base sm:text-lg font-semibold text-red-900 mt-2 sm:mt-3 break-words">{formatCurrency(worstOption.finalAmount)}</p>
+              <p className="text-base sm:text-lg font-semibold text-gray-700 mt-2 sm:mt-3 break-words">{formatCurrency(worstOption.finalAmount)}</p>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-2 border-[#DC2626] bg-gradient-to-br from-[#DC2626] to-[#EF4444] text-white sm:col-span-2 md:col-span-1">
+          <Card className="shadow-lg border-l-4 border-[#DC2626] bg-white sm:col-span-2 md:col-span-1">
             <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-base sm:text-lg">Ahorro Potencial</CardTitle>
-              <CardDescription className="text-red-100 text-xs sm:text-sm">Eligiendo la mejor opción</CardDescription>
+              <CardTitle className="text-gray-900 text-base sm:text-lg">Ahorro Potencial</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Eligiendo la mejor opción</CardDescription>
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0">
-              <p className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2 break-words">{formatCurrency(savings)}</p>
-              <p className="text-xs sm:text-sm opacity-90">Diferencia entre mejor y peor opción</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#DC2626] mb-1 sm:mb-2 break-words">{formatCurrency(savings)}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Diferencia entre mejor y peor opción</p>
             </CardContent>
           </Card>
         </div>

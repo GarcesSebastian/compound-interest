@@ -63,21 +63,21 @@ export function GrowthChart({ capital, rate, years, bankName }: GrowthChartProps
   }
 
   return (
-    <Card className="shadow-lg border-2 border-gray-200 overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-[#DC2626] to-[#EF4444] text-white p-4 sm:p-6">
+    <Card className="shadow-lg border border-gray-200">
+      <CardHeader className="bg-white border-b border-gray-200">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div className="min-w-0 flex-1">
             <CardTitle className="text-lg sm:text-xl md:text-2xl flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 text-[#DC2626]" />
               <span className="truncate">Crecimiento del Capital en el Tiempo</span>
             </CardTitle>
-            <CardDescription className="text-red-100 mt-1 sm:mt-2 text-xs sm:text-sm">
+            <CardDescription className="mt-1 sm:mt-2 text-xs sm:text-sm">
               Visualización interactiva del crecimiento exponencial - {bankName}
             </CardDescription>
           </div>
           <div className="text-left sm:text-right flex-shrink-0">
-            <div className="text-xs sm:text-sm text-red-100">Crecimiento Total</div>
-            <div className="text-2xl sm:text-3xl font-bold">+{growthPercentage}%</div>
+            <div className="text-xs sm:text-sm text-gray-600">Crecimiento Total</div>
+            <div className="text-2xl sm:text-3xl font-bold text-[#DC2626]">+{growthPercentage}%</div>
           </div>
         </div>
       </CardHeader>
@@ -147,14 +147,14 @@ export function GrowthChart({ capital, rate, years, bankName }: GrowthChartProps
         </div>
 
         {/* Growth Explanation */}
-        <div className="mt-4 sm:mt-6 bg-blue-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border-2 border-blue-200">
-          <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
-            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+        <div className="mt-4 sm:mt-6 bg-white p-4 sm:p-6 border-l-4 border-[#DC2626] shadow-sm">
+          <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-[#DC2626]" />
             Análisis del Crecimiento Exponencial
           </h4>
           <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
             El gráfico muestra cómo tu capital crece de forma{" "}
-            <span className="font-bold text-blue-700">exponencial</span> debido al interés compuesto. Cada mes, los
+            <span className="font-bold text-[#DC2626]">exponencial</span> debido al interés compuesto. Cada mes, los
             intereses se calculan sobre el capital acumulado (principal + intereses anteriores), lo que genera un efecto
             de "bola de nieve" que acelera el crecimiento con el tiempo. En {years} {years === 1 ? "año" : "años"}, tu
             inversión inicial de {formatCurrency(capital)} se convierte en {formatCurrency(finalAmount)}, un incremento

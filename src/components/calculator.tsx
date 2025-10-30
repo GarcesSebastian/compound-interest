@@ -8,6 +8,7 @@ import { formatCurrency } from "@/lib/utils"
 import { calculateCompoundInterest, calculateContinuousInterest } from "@/lib/calculations"
 import { TrendingUp, DollarSign, Calendar, Building2, AlertCircle, CheckCircle2 } from "lucide-react"
 import { GrowthChart } from "@/components/growth-chart"
+import { BlockMath, InlineMath } from "@/components/math-renderer"
 
 interface CalculatorProps {
   capital: number
@@ -226,10 +227,8 @@ export function Calculator({
             {/* Formula Display */}
             <div className="bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl p-4 sm:p-6 border border-white/20">
               <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4">Fórmula Utilizada (Modelo Discreto)</h3>
-              <div className="bg-white rounded-lg p-4 sm:p-6 mb-3 sm:mb-4 overflow-x-auto">
-                <p className="text-center text-lg sm:text-xl md:text-2xl font-bold text-gray-900 whitespace-nowrap">
-                  P(t) = P₀ × (1 + r/n)<sup>nt</sup>
-                </p>
+              <div className="bg-white rounded-lg p-4 sm:p-6 mb-3 sm:mb-4 [&_.katex]:text-gray-900">
+                <BlockMath>{"P(t) = P_0 \\times \\left(1 + \\frac{r}{n}\\right)^{nt}"}</BlockMath>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm">
                 <div className="bg-white/10 rounded-lg p-2 sm:p-3">
@@ -259,40 +258,40 @@ export function Calculator({
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Comparación: Modelo Discreto vs Continuo</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-              <div className="bg-green-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border-2 border-green-300">
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-green-900 mb-3 sm:mb-4">Modelo Discreto (Real)</h3>
+              <div className="bg-white p-4 sm:p-6 border-l-4 border-[#DC2626] shadow-sm">
+                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Modelo Discreto (Real)</h3>
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="bg-white rounded-lg p-3 sm:p-4 border border-green-200">
+                  <div className="bg-gray-50 p-3 sm:p-4 border border-gray-200">
                     <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Fórmula</p>
-                    <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
-                      P(t) = P₀(1 + r/n)<sup>nt</sup>
-                    </p>
+                    <div className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
+                      <InlineMath>{"P(t) = P_0\\left(1 + \\frac{r}{n}\\right)^{nt}"}</InlineMath>
+                    </div>
                   </div>
-                  <div className="bg-white rounded-lg p-3 sm:p-4 border border-green-200">
+                  <div className="bg-gray-50 p-3 sm:p-4 border border-gray-200">
                     <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Resultado</p>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700 break-words">{formatCurrency(result.finalAmount)}</p>
+                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-[#DC2626] break-words">{formatCurrency(result.finalAmount)}</p>
                   </div>
-                  <div className="bg-white rounded-lg p-3 sm:p-4 border border-green-200">
+                  <div className="bg-gray-50 p-3 sm:p-4 border border-gray-200">
                     <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Capitalización</p>
                     <p className="text-sm sm:text-base font-bold text-gray-900">Mensual (n = 12)</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border-2 border-blue-300">
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-blue-900 mb-3 sm:mb-4">Modelo Continuo (Teórico)</h3>
+              <div className="bg-white p-4 sm:p-6 border-l-4 border-gray-400 shadow-sm">
+                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Modelo Continuo (Teórico)</h3>
                 <div className="space-y-3 sm:space-y-4">
-                  <div className="bg-white rounded-lg p-3 sm:p-4 border border-blue-200">
+                  <div className="bg-gray-50 p-3 sm:p-4 border border-gray-200">
                     <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Fórmula</p>
-                    <p className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
-                      P(t) = P₀e<sup>rt</sup>
-                    </p>
+                    <div className="text-sm sm:text-base md:text-lg font-bold text-gray-900">
+                      <InlineMath>{"P(t) = P_0 e^{rt}"}</InlineMath>
+                    </div>
                   </div>
-                  <div className="bg-white rounded-lg p-3 sm:p-4 border border-blue-200">
+                  <div className="bg-gray-50 p-3 sm:p-4 border border-gray-200">
                     <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Resultado</p>
-                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-700 break-words">{formatCurrency(continuousResult.finalAmount)}</p>
+                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-700 break-words">{formatCurrency(continuousResult.finalAmount)}</p>
                   </div>
-                  <div className="bg-white rounded-lg p-3 sm:p-4 border border-blue-200">
+                  <div className="bg-gray-50 p-3 sm:p-4 border border-gray-200">
                     <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Capitalización</p>
                     <p className="text-sm sm:text-base font-bold text-gray-900">Continua (n → ∞)</p>
                   </div>
@@ -300,27 +299,27 @@ export function Calculator({
               </div>
             </div>
 
-            <div className="bg-yellow-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border-2 border-yellow-300">
-              <h3 className="text-base sm:text-lg font-bold text-yellow-900 mb-3 sm:mb-4">Análisis de Diferencia</h3>
+            <div className="bg-gray-50 p-4 sm:p-6 border border-gray-300">
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Análisis de Diferencia</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                <div className="bg-white rounded-lg p-3 sm:p-4 border border-yellow-200">
+                <div className="bg-white p-3 sm:p-4 border border-gray-200">
                   <p className="text-xs sm:text-sm text-gray-600 mb-1">Diferencia Absoluta</p>
-                  <p className="text-base sm:text-lg md:text-xl font-bold text-yellow-700 break-words">
+                  <p className="text-base sm:text-lg md:text-xl font-bold text-gray-900 break-words">
                     {formatCurrency(Math.abs(continuousResult.finalAmount - result.finalAmount))}
                   </p>
                 </div>
-                <div className="bg-white rounded-lg p-3 sm:p-4 border border-yellow-200">
+                <div className="bg-white p-3 sm:p-4 border border-gray-200">
                   <p className="text-xs sm:text-sm text-gray-600 mb-1">Diferencia Relativa</p>
-                  <p className="text-base sm:text-lg md:text-xl font-bold text-yellow-700">
+                  <p className="text-base sm:text-lg md:text-xl font-bold text-gray-900">
                     {(Math.abs((continuousResult.finalAmount - result.finalAmount) / result.finalAmount) * 100).toFixed(
                       2,
                     )}
                     %
                   </p>
                 </div>
-                <div className="bg-white rounded-lg p-3 sm:p-4 border border-yellow-200">
+                <div className="bg-white p-3 sm:p-4 border border-gray-200">
                   <p className="text-xs sm:text-sm text-gray-600 mb-1">Modelo Mayor</p>
-                  <p className="text-base sm:text-lg md:text-xl font-bold text-yellow-700">
+                  <p className="text-base sm:text-lg md:text-xl font-bold text-gray-900">
                     {continuousResult.finalAmount > result.finalAmount ? "Continuo" : "Discreto"}
                   </p>
                 </div>
@@ -330,19 +329,19 @@ export function Calculator({
 
           {/* Savings Alert */}
           {potentialSavings > 0 && (
-            <div className="bg-orange-50 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 border-2 border-orange-300">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 border-l-4 border-[#DC2626]">
               <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#DC2626] rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
                   <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-orange-900 mb-2 sm:mb-3">Oportunidad de Ahorro Detectada</h3>
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">Oportunidad de Ahorro Detectada</h3>
                   <p className="text-sm sm:text-base md:text-lg text-gray-700 mb-3 sm:mb-4">
                     Podrías ahorrar{" "}
-                    <span className="font-bold text-orange-600 text-base sm:text-lg md:text-xl lg:text-2xl">{formatCurrency(potentialSavings)}</span>{" "}
+                    <span className="font-bold text-[#DC2626] text-base sm:text-lg md:text-xl lg:text-2xl">{formatCurrency(potentialSavings)}</span>{" "}
                     eligiendo {bestBank.name}, la mejor opción del mercado.
                   </p>
-                  <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-6 border-2 border-orange-200">
+                  <div className="bg-gray-50 p-4 sm:p-6 border border-gray-300">
                     <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 font-semibold">Comparación de Costos:</p>
                     <div className="space-y-1.5 sm:space-y-2">
                       <div className="flex justify-between items-center gap-2">
@@ -353,9 +352,9 @@ export function Calculator({
                         <span className="font-semibold text-gray-700 text-xs sm:text-sm truncate">{bestBank.name}:</span>
                         <span className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-green-600 whitespace-nowrap">{formatCurrency(bestBank.finalAmount)}</span>
                       </div>
-                      <div className="pt-2 border-t-2 border-orange-200 flex justify-between items-center gap-2">
-                        <span className="font-bold text-orange-900 text-xs sm:text-sm">Ahorro Potencial:</span>
-                        <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-orange-600 whitespace-nowrap">{formatCurrency(potentialSavings)}</span>
+                      <div className="pt-2 border-t-2 border-gray-300 flex justify-between items-center gap-2">
+                        <span className="font-bold text-gray-900 text-xs sm:text-sm">Ahorro Potencial:</span>
+                        <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#DC2626] whitespace-nowrap">{formatCurrency(potentialSavings)}</span>
                       </div>
                     </div>
                   </div>
@@ -365,13 +364,13 @@ export function Calculator({
           )}
 
           {potentialSavings === 0 && (
-            <div className="bg-green-50 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 border-2 border-green-300">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 border-l-4 border-green-500">
               <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
                   <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-green-900 mb-1 sm:mb-2">¡Excelente Elección!</h3>
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">¡Excelente Elección!</h3>
                   <p className="text-sm sm:text-base md:text-lg text-gray-700">
                     {bank.name} ofrece la tasa más competitiva del mercado. Esta es la mejor opción disponible para
                     minimizar el costo total de tu préstamo.
