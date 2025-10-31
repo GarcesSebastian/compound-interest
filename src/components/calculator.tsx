@@ -82,12 +82,12 @@ export function Calculator({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {/* Capital Input */}
           <div className="space-y-3 sm:space-y-4">
-            <div className="flex items-center justify-between gap-2">
+            <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-2">
               <Label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 flex items-center gap-1 sm:gap-2">
                 <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-[#DC2626] flex-shrink-0" />
-                <span className="truncate">Capital Inicial (P₀)</span>
+                <span>Capital Inicial (P₀)</span>
               </Label>
-              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap text-right">{formatCurrency(capital)}</span>
+              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap block">{formatCurrency(capital)}</span>
             </div>
             <Slider
               value={[capital]}
@@ -105,12 +105,12 @@ export function Calculator({
 
           {/* Years Input */}
           <div className="space-y-3 sm:space-y-4">
-            <div className="flex items-center justify-between gap-2">
+            <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-2">
               <Label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 flex items-center gap-1 sm:gap-2">
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#DC2626] flex-shrink-0" />
-                Plazo (t)
+                <span>Plazo (t)</span>
               </Label>
-              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap">
+              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap block">
                 {years} {years === 1 ? "año" : "años"}
               </span>
             </div>
@@ -130,19 +130,19 @@ export function Calculator({
 
           {/* Compounding Frequency Input */}
           <div className="space-y-3 sm:space-y-4">
-            <div className="flex items-center justify-between gap-2">
+            <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-2">
               <Label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 flex items-center gap-1 sm:gap-2">
                 <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#DC2626] flex-shrink-0" />
-                Capitalización (n)
+                <span>Capitalización (n)</span>
               </Label>
-              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap">
+              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap block">
                 {compoundingFrequency === 1 ? 'Anual' : compoundingFrequency === 2 ? 'Semestral' : compoundingFrequency === 4 ? 'Trimestral' : compoundingFrequency === 12 ? 'Mensual' : 'Diaria'}
               </span>
             </div>
             <select
               value={compoundingFrequency}
               onChange={(e) => setCompoundingFrequency(Number(e.target.value))}
-              className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:border-[#DC2626] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 bg-white"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border-2 border-gray-300 rounded-lg focus:border-[#DC2626] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 bg-white"
             >
               <option value={1}>Anual (1 vez/año)</option>
               <option value={2}>Semestral (2 veces/año)</option>
@@ -150,7 +150,7 @@ export function Calculator({
               <option value={12}>Mensual (12 veces/año)</option>
               <option value={365}>Diaria (365 veces/año)</option>
             </select>
-            <div className="text-sm text-gray-500 font-medium">
+            <div className="text-xs sm:text-sm text-gray-500 font-medium">
               <p>Períodos por año: {compoundingFrequency}</p>
             </div>
           </div>
