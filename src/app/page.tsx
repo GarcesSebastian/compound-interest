@@ -7,8 +7,9 @@ import { MathExplanation } from "@/components/math-explanation"
 import { BankComparison } from "@/components/bank-comparison"
 import { RateUpdater } from "@/components/rate-updater"
 import { Button } from "@/components/ui/button"
-import { RefreshCw } from "lucide-react"
+import { RefreshCw, QrCode } from "lucide-react"
 import { LoanModeProvider } from "@/contexts/loan-mode-context"
+import Link from "next/link"
 
 type Section = "calculator" | "advanced" | "math" | "comparison"
 
@@ -114,6 +115,14 @@ export default function Home() {
           <p className="text-xs mt-1 text-gray-500">Sebastian Garces, Isail Florez, Luis Brieva, Marcos Jacome</p>
         </div>
       </footer>
+
+      <Link href="/qr" className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50">
+        <Button
+          className="h-9 sm:h-10 w-9 sm:w-10 p-0 bg-slate-200 hover:bg-[#DC2626] text-slate-600 hover:text-white shadow-md hover:shadow-xl transition-all opacity-40 hover:opacity-100"
+        >
+          <QrCode className="w-4 h-4 sm:w-5 sm:h-5" />
+        </Button>
+      </Link>
 
       <Button
         onClick={() => setShowRateUpdater(true)}
