@@ -11,16 +11,17 @@ interface GrowthChartProps {
   rate: number
   years: number
   bankName: string
+  compoundingFrequency: number
 }
 
-export function GrowthChart({ capital, rate, years, bankName }: GrowthChartProps) {
+export function GrowthChart({ capital, rate, years, bankName, compoundingFrequency }: GrowthChartProps) {
   // Generate data points for each month
   const months = years * 12
   const dataPoints = []
 
   for (let month = 0; month <= months; month++) {
     const yearFraction = month / 12
-    const result = calculateCompoundInterest(capital, rate, yearFraction, 12)
+    const result = calculateCompoundInterest(capital, rate, yearFraction, compoundingFrequency)
 
     dataPoints.push({
       month,

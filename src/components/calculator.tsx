@@ -39,6 +39,7 @@ export function Calculator({
   const [banks, setBanks] = useState(DEFAULT_BANKS)
   const [isClient, setIsClient] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [compoundingFrequency, setCompoundingFrequency] = useState(12)
 
   useEffect(() => {
     setIsClient(true)
@@ -53,14 +54,14 @@ export function Calculator({
   }, [refreshKey, isClient])
 
   const bank = selectedBank ? banks.find((b) => b.id === selectedBank) : null
-  const result = bank ? calculateCompoundInterest(capital, bank.rate, years, 12) : null
+  const result = bank ? calculateCompoundInterest(capital, bank.rate, years, compoundingFrequency) : null
   const continuousResult = bank ? calculateContinuousInterest(capital, bank.rate, years) : null
 
   // Calculate all banks for comparison
   const allResults = banks
     .map((b) => ({
       ...b,
-      ...calculateCompoundInterest(capital, b.rate, years, 12),
+      ...calculateCompoundInterest(capital, b.rate, years, compoundingFrequency),
     }))
     .sort((a, b) => a.finalAmount - b.finalAmount)
 
@@ -78,7 +79,7 @@ export function Calculator({
           <span className="truncate">Parámetros del Préstamo</span>
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {/* Capital Input */}
           <div className="space-y-3 sm:space-y-4">
             <div className="flex items-center justify-between gap-2">
@@ -126,6 +127,33 @@ export function Calculator({
               <span>10 años</span>
             </div>
           </div>
+
+          {/* Compounding Frequency Input */}
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              <Label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 flex items-center gap-1 sm:gap-2">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#DC2626] flex-shrink-0" />
+                Capitalización (n)
+              </Label>
+              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap">
+                {compoundingFrequency === 1 ? 'Anual' : compoundingFrequency === 2 ? 'Semestral' : compoundingFrequency === 4 ? 'Trimestral' : compoundingFrequency === 12 ? 'Mensual' : 'Diaria'}
+              </span>
+            </div>
+            <select
+              value={compoundingFrequency}
+              onChange={(e) => setCompoundingFrequency(Number(e.target.value))}
+              className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:border-[#DC2626] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 bg-white"
+            >
+              <option value={1}>Anual (1 vez/año)</option>
+              <option value={2}>Semestral (2 veces/año)</option>
+              <option value={4}>Trimestral (4 veces/año)</option>
+              <option value={12}>Mensual (12 veces/año)</option>
+              <option value={365}>Diaria (365 veces/año)</option>
+            </select>
+            <div className="text-sm text-gray-500 font-medium">
+              <p>Períodos por año: {compoundingFrequency}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -156,7 +184,7 @@ export function Calculator({
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {banks.map((b) => {
-              const bankResult = calculateCompoundInterest(capital, b.rate, years, 12)
+              const bankResult = calculateCompoundInterest(capital, b.rate, years, compoundingFrequency)
               const isSelected = selectedBank === b.id
               const isBest = b.id === bestBank.id
 
@@ -203,7 +231,7 @@ export function Calculator({
       {/* Results Section */}
       {result && bank && continuousResult && (
         <>
-          <GrowthChart capital={capital} rate={bank.rate} years={years} bankName={bank.name} />
+          <GrowthChart capital={capital} rate={bank.rate} years={years} bankName={bank.name} compoundingFrequency={compoundingFrequency} />
 
           {/* Main Results */}
           <div className="bg-gradient-to-br from-[#DC2626] to-[#B91C1C] rounded-xl sm:rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 text-white">
@@ -243,7 +271,7 @@ export function Calculator({
                 </div>
                 <div className="bg-white/10 rounded-lg p-2 sm:p-3">
                   <p className="text-red-100 mb-1 text-xs">n</p>
-                  <p className="font-bold text-xs sm:text-sm">12 (mensual)</p>
+                  <p className="font-bold text-xs sm:text-sm">{compoundingFrequency} ({compoundingFrequency === 1 ? 'anual' : compoundingFrequency === 2 ? 'semestral' : compoundingFrequency === 4 ? 'trimestral' : compoundingFrequency === 12 ? 'mensual' : 'diaria'})</p>
                 </div>
                 <div className="bg-white/10 rounded-lg p-2 sm:p-3">
                   <p className="text-red-100 mb-1 text-xs">t</p>
@@ -273,7 +301,7 @@ export function Calculator({
                   </div>
                   <div className="bg-gray-50 p-3 sm:p-4 border border-gray-200">
                     <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">Capitalización</p>
-                    <p className="text-sm sm:text-base font-bold text-gray-900">Mensual (n = 12)</p>
+                    <p className="text-sm sm:text-base font-bold text-gray-900">{compoundingFrequency === 1 ? 'Anual' : compoundingFrequency === 2 ? 'Semestral' : compoundingFrequency === 4 ? 'Trimestral' : compoundingFrequency === 12 ? 'Mensual' : 'Diaria'} (n = {compoundingFrequency})</p>
                   </div>
                 </div>
               </div>

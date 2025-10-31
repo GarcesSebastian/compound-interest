@@ -16,6 +16,7 @@ import {
   type RatePeriod,
   type ContributionResult,
   type LoanResult,
+  type AmortizationRow,
 } from "@/lib/calculations"
 import { formatCurrency } from "@/lib/utils"
 import { PlusCircle, Calculator as CalcIcon } from "lucide-react"
@@ -25,9 +26,61 @@ import { useLoanMode } from "@/contexts/loan-mode-context"
 
 type CalculatorMode = "contributions" | "variableRates" | "complete"
 
+// Componente de tabla de amortización
+function AmortizationTable({ data, title }: { data: AmortizationRow[], title: string }) {
+  const [showAll, setShowAll] = useState(false)
+  const displayData = showAll ? data : data.slice(0, 12)
+
+  return (
+    <div className="bg-white border-l-4 border-[#DC2626] shadow-lg rounded-lg overflow-hidden">
+      <div className="bg-gray-50 p-4 border-b border-gray-200">
+        <h4 className="font-bold text-gray-900 text-base">{title}</h4>
+        <p className="text-xs text-gray-600 mt-1">Desglose detallado de pagos e intereses</p>
+      </div>
+      
+      <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-100 border-b-2 border-gray-300 sticky top-0">
+            <tr>
+              <th className="px-3 py-2 text-left font-semibold text-gray-700">Período</th>
+              <th className="px-3 py-2 text-right font-semibold text-gray-700">Pago</th>
+              <th className="px-3 py-2 text-right font-semibold text-gray-700">Interés</th>
+              <th className="px-3 py-2 text-right font-semibold text-gray-700">Capital</th>
+              <th className="px-3 py-2 text-right font-semibold text-gray-700">Saldo</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {displayData.map((row, index) => (
+              <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                <td className="px-3 py-2 text-gray-900 font-medium">{row.period}</td>
+                <td className="px-3 py-2 text-right text-gray-900">{formatCurrency(row.payment)}</td>
+                <td className="px-3 py-2 text-right text-[#DC2626] font-semibold">{formatCurrency(row.interest)}</td>
+                <td className="px-3 py-2 text-right text-gray-900 font-semibold">{formatCurrency(row.principal)}</td>
+                <td className="px-3 py-2 text-right text-gray-900 font-bold">{formatCurrency(row.balance)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {data.length > 12 && (
+        <div className="p-3 bg-gray-50 border-t border-gray-200 text-center">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="text-sm font-semibold text-[#DC2626] hover:text-[#B91C1C] transition-colors"
+          >
+            {showAll ? `Mostrar solo primeros 12 meses` : `Ver todos los ${data.length} períodos`}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function AdvancedCalculator() {
   const [mode, setMode] = useState<CalculatorMode>("contributions")
   const { isLoanMode, setIsLoanMode } = useLoanMode()
+  const [compoundingFrequency, setCompoundingFrequency] = useState(12)
 
   // Contributions state with flexible inputs
   const principal = useNumericInput(5000000, 0)
@@ -65,7 +118,7 @@ export function AdvancedCalculator() {
         principal.numericValue,
         annualRate.numericValue,
         years.numericValue,
-        12,
+        compoundingFrequency,
         monthlyContribution.numericValue
       )
       const continuous = calculateContinuousLoanWithPayments(
@@ -81,7 +134,7 @@ export function AdvancedCalculator() {
         principal.numericValue,
         annualRate.numericValue,
         years.numericValue,
-        12,
+        compoundingFrequency,
         monthlyContribution.numericValue
       )
       const continuous = calculateContinuousWithContributions(
@@ -95,7 +148,7 @@ export function AdvancedCalculator() {
   }
 
   const calculateVariableRates = () => {
-    const result = calculateWithVariableRates(varPrincipal.numericValue, ratePeriods, 12)
+    const result = calculateWithVariableRates(varPrincipal.numericValue, ratePeriods, compoundingFrequency)
     setVarRatesResult(result)
   }
 
@@ -105,7 +158,7 @@ export function AdvancedCalculator() {
       const result = calculateVariableRatesLoanWithPayments(
         completePrincipal.numericValue,
         completeRatePeriods,
-        12,
+        compoundingFrequency,
         completeContribution.numericValue,
       )
       setCompleteResult(result)
@@ -114,7 +167,7 @@ export function AdvancedCalculator() {
       const result = calculateVariableRatesWithContributions(
         completePrincipal.numericValue,
         completeRatePeriods,
-        12,
+        compoundingFrequency,
         completeContribution.numericValue,
       )
       setCompleteResult(result)
@@ -231,8 +284,8 @@ export function AdvancedCalculator() {
 
       {/* Contributions Calculator */}
       {mode === "contributions" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          <Card className="shadow-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:items-start">
+          <Card className="shadow-lg h-fit">
             <CardHeader className="bg-white border-b border-gray-200">
               <CardTitle className="text-lg sm:text-xl">Calculadora con Aportes Regulares</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Modelo discreto y continuo</CardDescription>
@@ -314,7 +367,7 @@ export function AdvancedCalculator() {
 
               <div className="space-y-2">
                 <Label htmlFor="monthly-contrib" className="text-sm font-semibold">
-                  Aporte Mensual (COP)
+                  Aporte Regular (COP)
                 </Label>
                 <Input
                   id="monthly-contrib"
@@ -325,6 +378,24 @@ export function AdvancedCalculator() {
                   onBlur={monthlyContribution.handleBlur}
                   className="text-base"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="compounding-freq" className="text-sm font-semibold">
+                  Frecuencia de Capitalización
+                </Label>
+                <select
+                  id="compounding-freq"
+                  value={compoundingFrequency}
+                  onChange={(e) => setCompoundingFrequency(Number(e.target.value))}
+                  className="w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:border-[#DC2626] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 bg-white"
+                >
+                  <option value={1}>Anual (1 vez/año)</option>
+                  <option value={2}>Semestral (2 veces/año)</option>
+                  <option value={4}>Trimestral (4 veces/año)</option>
+                  <option value={12}>Mensual (12 veces/año)</option>
+                  <option value={365}>Diaria (365 veces/año)</option>
+                </select>
               </div>
 
               <Button onClick={calculateContributions} className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-base py-6">
@@ -588,6 +659,27 @@ export function AdvancedCalculator() {
                   </div>
                 </div>
               </div>
+
+              {/* Tablas de Amortización (solo en modo préstamo) */}
+              {isLoanMode && contribResult && isLoanResult(contribResult.discrete) && contribResult.discrete.amortizationTable && contribResult.discrete.amortizationTable.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Tablas de Amortización</h3>
+                  
+                  {/* Tabla Modelo Discreto */}
+                  <AmortizationTable 
+                    data={contribResult.discrete.amortizationTable} 
+                    title="Tabla de Amortización - Modelo Discreto (Real)"
+                  />
+
+                  {/* Tabla Modelo Continuo */}
+                  {isLoanResult(contribResult.continuous) && contribResult.continuous.amortizationTable && (
+                    <AmortizationTable 
+                      data={contribResult.continuous.amortizationTable} 
+                      title="Tabla de Amortización - Modelo Continuo (Teórico)"
+                    />
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -595,8 +687,8 @@ export function AdvancedCalculator() {
 
       {/* Variable Rates Calculator */}
       {mode === "variableRates" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          <Card className="shadow-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:items-start">
+          <Card className="shadow-lg h-fit">
             <CardHeader className="bg-white border-b border-gray-200">
               <CardTitle className="text-lg sm:text-xl">Calculadora con Tasas Variables</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Múltiples períodos con diferentes tasas</CardDescription>
@@ -643,6 +735,24 @@ export function AdvancedCalculator() {
                     onRemove={removeRatePeriod}
                   />
                 ))}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="compounding-freq-var" className="text-sm font-semibold">
+                  Frecuencia de Capitalización
+                </Label>
+                <select
+                  id="compounding-freq-var"
+                  value={compoundingFrequency}
+                  onChange={(e) => setCompoundingFrequency(Number(e.target.value))}
+                  className="w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:border-[#DC2626] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 bg-white"
+                >
+                  <option value={1}>Anual (1 vez/año)</option>
+                  <option value={2}>Semestral (2 veces/año)</option>
+                  <option value={4}>Trimestral (4 veces/año)</option>
+                  <option value={12}>Mensual (12 veces/año)</option>
+                  <option value={365}>Diaria (365 veces/año)</option>
+                </select>
               </div>
 
               <Button onClick={calculateVariableRates} className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-base py-6">
@@ -699,8 +809,8 @@ export function AdvancedCalculator() {
 
       {/* Complete Model Calculator */}
       {mode === "complete" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          <Card className="shadow-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:items-start">
+          <Card className="shadow-lg h-fit">
             <CardHeader className="bg-white border-b border-gray-200">
               <CardTitle className="text-lg sm:text-xl">Modelo Completo</CardTitle>
               <CardDescription className="text-xs sm:text-sm">Tasas variables + Aportes periódicos</CardDescription>
@@ -751,7 +861,7 @@ export function AdvancedCalculator() {
 
               <div className="space-y-2">
                 <Label htmlFor="complete-contribution" className="text-sm font-semibold">
-                  Aporte Mensual (COP)
+                  Aporte Regular (COP)
                 </Label>
                 <Input
                   id="complete-contribution"
@@ -790,6 +900,24 @@ export function AdvancedCalculator() {
                     onRemove={removeCompleteRatePeriod}
                   />
                 ))}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="compounding-freq-complete" className="text-sm font-semibold">
+                  Frecuencia de Capitalización
+                </Label>
+                <select
+                  id="compounding-freq-complete"
+                  value={compoundingFrequency}
+                  onChange={(e) => setCompoundingFrequency(Number(e.target.value))}
+                  className="w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:border-[#DC2626] focus:outline-none focus:ring-2 focus:ring-[#DC2626]/20 bg-white"
+                >
+                  <option value={1}>Anual (1 vez/año)</option>
+                  <option value={2}>Semestral (2 veces/año)</option>
+                  <option value={4}>Trimestral (4 veces/año)</option>
+                  <option value={12}>Mensual (12 veces/año)</option>
+                  <option value={365}>Diaria (365 veces/año)</option>
+                </select>
               </div>
 
               <Button onClick={calculateComplete} className="w-full bg-[#DC2626] hover:bg-[#B91C1C] text-base py-6">
@@ -951,6 +1079,17 @@ export function AdvancedCalculator() {
                   </div>
                 </div>
               </div>
+
+              {/* Tabla de Amortización (solo en modo préstamo) */}
+              {isLoanMode && completeResult && isLoanResult(completeResult) && completeResult.amortizationTable && completeResult.amortizationTable.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Tabla de Amortización</h3>
+                  <AmortizationTable 
+                    data={completeResult.amortizationTable} 
+                    title="Tabla de Amortización - Modelo Completo"
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -16,6 +16,14 @@ export interface ContributionResult {
   netReturn: number
 }
 
+export interface AmortizationRow {
+  period: number // Número de período (mes)
+  payment: number // Pago del período
+  interest: number // Interés del período
+  principal: number // Capital amortizado en el período
+  balance: number // Saldo restante después del pago
+}
+
 export interface LoanResult {
   finalBalance: number // Saldo final (deuda restante)
   totalPaid: number // Total pagado
@@ -24,6 +32,7 @@ export interface LoanResult {
   warning?: string // Advertencia si los pagos no cubren intereses
   monthsUsed?: number // Meses reales utilizados para pagar
   lastPaymentAdjusted?: number // Monto del último pago ajustado
+  amortizationTable?: AmortizationRow[] // Tabla de amortización mes a mes
 }
 
 /**
@@ -297,6 +306,7 @@ export function calculateLoanWithPayments(
   let warning: string | undefined
   let monthsUsed = 0
   let lastPaymentAdjusted: number | undefined
+  const amortizationTable: AmortizationRow[] = []
 
   // Simular cada período
   for (let i = 0; i < totalPeriods; i++) {
@@ -309,6 +319,10 @@ export function calculateLoanWithPayments(
       warning = "Los pagos no cubren los intereses, la deuda crecerá"
     }
 
+    // Determinar el pago real de este período
+    let actualPayment = regularPayment
+    let principalPayment = regularPayment - interestThisPeriod
+
     // Aplicar pago
     balance = balance + interestThisPeriod - regularPayment
     totalPaid += regularPayment
@@ -319,10 +333,30 @@ export function calculateLoanWithPayments(
       // Ajustar el último pago
       const overpayment = -balance
       lastPaymentAdjusted = regularPayment - overpayment
+      actualPayment = lastPaymentAdjusted
+      principalPayment = actualPayment - interestThisPeriod
       totalPaid += balance // balance es negativo, así que esto resta
       balance = 0
+      
+      // Agregar fila a la tabla
+      amortizationTable.push({
+        period: i + 1,
+        payment: actualPayment,
+        interest: interestThisPeriod,
+        principal: principalPayment,
+        balance: 0,
+      })
       break
     }
+
+    // Agregar fila a la tabla
+    amortizationTable.push({
+      period: i + 1,
+      payment: actualPayment,
+      interest: interestThisPeriod,
+      principal: principalPayment,
+      balance: balance,
+    })
   }
 
   const principalPaid = principal - balance
@@ -335,6 +369,7 @@ export function calculateLoanWithPayments(
     warning,
     monthsUsed,
     lastPaymentAdjusted,
+    amortizationTable,
   }
 }
 
@@ -363,6 +398,7 @@ export function calculateContinuousLoanWithPayments(
   let warning: string | undefined
   let monthsUsed = 0
   let lastPaymentAdjusted: number | undefined
+  const amortizationTable: AmortizationRow[] = []
 
   // Simular cada período
   for (let i = 0; i < totalPeriods; i++) {
@@ -375,6 +411,10 @@ export function calculateContinuousLoanWithPayments(
       warning = "Los pagos no cubren los intereses, la deuda crecerá"
     }
 
+    // Determinar el pago real de este período
+    let actualPayment = regularPayment
+    let principalPayment = regularPayment - interestThisPeriod
+
     // Aplicar pago
     balance = balance + interestThisPeriod - regularPayment
     totalPaid += regularPayment
@@ -384,10 +424,30 @@ export function calculateContinuousLoanWithPayments(
     if (balance < 0) {
       const overpayment = -balance
       lastPaymentAdjusted = regularPayment - overpayment
+      actualPayment = lastPaymentAdjusted
+      principalPayment = actualPayment - interestThisPeriod
       totalPaid += balance // balance es negativo
       balance = 0
+      
+      // Agregar fila a la tabla
+      amortizationTable.push({
+        period: i + 1,
+        payment: actualPayment,
+        interest: interestThisPeriod,
+        principal: principalPayment,
+        balance: 0,
+      })
       break
     }
+
+    // Agregar fila a la tabla
+    amortizationTable.push({
+      period: i + 1,
+      payment: actualPayment,
+      interest: interestThisPeriod,
+      principal: principalPayment,
+      balance: balance,
+    })
   }
 
   const principalPaid = principal - balance
@@ -400,6 +460,7 @@ export function calculateContinuousLoanWithPayments(
     warning,
     monthsUsed,
     lastPaymentAdjusted,
+    amortizationTable,
   }
 }
 
@@ -423,6 +484,7 @@ export function calculateVariableRatesLoanWithPayments(
   let warning: string | undefined
   let monthsUsed = 0
   let lastPaymentAdjusted: number | undefined
+  const amortizationTable: AmortizationRow[] = []
 
   // Procesar cada período de tasa
   for (const period of ratePeriods) {
@@ -439,6 +501,10 @@ export function calculateVariableRatesLoanWithPayments(
         warning = "Los pagos no cubren los intereses, la deuda crecerá"
       }
 
+      // Determinar el pago real de este período
+      let actualPayment = regularPayment
+      let principalPayment = regularPayment - interestThisPeriod
+
       balance = balance + interestThisPeriod - regularPayment
       totalPaid += regularPayment
       monthsUsed++
@@ -446,10 +512,30 @@ export function calculateVariableRatesLoanWithPayments(
       if (balance < 0) {
         const overpayment = -balance
         lastPaymentAdjusted = regularPayment - overpayment
+        actualPayment = lastPaymentAdjusted
+        principalPayment = actualPayment - interestThisPeriod
         totalPaid += balance
         balance = 0
+        
+        // Agregar fila a la tabla
+        amortizationTable.push({
+          period: monthsUsed,
+          payment: actualPayment,
+          interest: interestThisPeriod,
+          principal: principalPayment,
+          balance: 0,
+        })
         break
       }
+
+      // Agregar fila a la tabla
+      amortizationTable.push({
+        period: monthsUsed,
+        payment: actualPayment,
+        interest: interestThisPeriod,
+        principal: principalPayment,
+        balance: balance,
+      })
     }
 
     if (balance === 0) break
@@ -465,5 +551,6 @@ export function calculateVariableRatesLoanWithPayments(
     warning,
     monthsUsed,
     lastPaymentAdjusted,
+    amortizationTable,
   }
 }
