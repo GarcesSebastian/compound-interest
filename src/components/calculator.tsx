@@ -79,56 +79,59 @@ export function Calculator({
           <span className="truncate">Parámetros del Préstamo</span>
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          {/* Capital Input */}
-          <div className="space-y-3 sm:space-y-4">
-            <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-2">
-              <Label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 flex items-center gap-1 sm:gap-2">
-                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-[#DC2626] flex-shrink-0" />
-                <span>Capital Inicial (P₀)</span>
-              </Label>
-              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap block">{formatCurrency(capital)}</span>
+        <div className="space-y-6 sm:space-y-8">
+          {/* Primera fila: Capital y Plazo */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {/* Capital Input */}
+            <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-2">
+                <Label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 flex items-center gap-1 sm:gap-2">
+                  <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-[#DC2626] flex-shrink-0" />
+                  <span>Capital Inicial (P₀)</span>
+                </Label>
+                <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap block">{formatCurrency(capital)}</span>
+              </div>
+              <Slider
+                value={[capital]}
+                onValueChange={([value]) => onCapitalChange(value)}
+                min={1000000}
+                max={50000000}
+                step={500000}
+                className="[&_[role=slider]]:bg-[#DC2626] [&_[role=slider]]:border-[#DC2626] [&_[role=slider]]:w-5 [&_[role=slider]]:h-5"
+              />
+              <div className="flex justify-between text-sm text-gray-500 font-medium">
+                <span>$1M</span>
+                <span>$50M</span>
+              </div>
             </div>
-            <Slider
-              value={[capital]}
-              onValueChange={([value]) => onCapitalChange(value)}
-              min={1000000}
-              max={50000000}
-              step={500000}
-              className="[&_[role=slider]]:bg-[#DC2626] [&_[role=slider]]:border-[#DC2626] [&_[role=slider]]:w-5 [&_[role=slider]]:h-5"
-            />
-            <div className="flex justify-between text-sm text-gray-500 font-medium">
-              <span>$1M</span>
-              <span>$50M</span>
+
+            {/* Years Input */}
+            <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-2">
+                <Label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 flex items-center gap-1 sm:gap-2">
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#DC2626] flex-shrink-0" />
+                  <span>Plazo (t)</span>
+                </Label>
+                <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap block">
+                  {years} {years === 1 ? "año" : "años"}
+                </span>
+              </div>
+              <Slider
+                value={[years]}
+                onValueChange={([value]) => onYearsChange(value)}
+                min={1}
+                max={10}
+                step={1}
+                className="[&_[role=slider]]:bg-[#DC2626] [&_[role=slider]]:border-[#DC2626] [&_[role=slider]]:w-5 [&_[role=slider]]:h-5"
+              />
+              <div className="flex justify-between text-sm text-gray-500 font-medium">
+                <span>1 año</span>
+                <span>10 años</span>
+              </div>
             </div>
           </div>
 
-          {/* Years Input */}
-          <div className="space-y-3 sm:space-y-4">
-            <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-2">
-              <Label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 flex items-center gap-1 sm:gap-2">
-                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#DC2626] flex-shrink-0" />
-                <span>Plazo (t)</span>
-              </Label>
-              <span className="text-lg sm:text-2xl md:text-3xl font-bold text-[#DC2626] whitespace-nowrap block">
-                {years} {years === 1 ? "año" : "años"}
-              </span>
-            </div>
-            <Slider
-              value={[years]}
-              onValueChange={([value]) => onYearsChange(value)}
-              min={1}
-              max={10}
-              step={1}
-              className="[&_[role=slider]]:bg-[#DC2626] [&_[role=slider]]:border-[#DC2626] [&_[role=slider]]:w-5 [&_[role=slider]]:h-5"
-            />
-            <div className="flex justify-between text-sm text-gray-500 font-medium">
-              <span>1 año</span>
-              <span>10 años</span>
-            </div>
-          </div>
-
-          {/* Compounding Frequency Input */}
+          {/* Segunda fila: Capitalización (ancho completo) */}
           <div className="space-y-3 sm:space-y-4">
             <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-2">
               <Label className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 flex items-center gap-1 sm:gap-2">
